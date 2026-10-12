@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "activeProfile": "game-dev",
+  "profiles": {
+    "game-dev": {
+      "providers": [
+        "roblox",
+        "blender",
+        "unity"
+      ]
+    }
+  },
+  "providers": {
+    "roblox": {
+      "transport": "stdio",
+      "command": "${env:LOCALAPPDATA}\\Roblox\\mcp.bat",
+      "args": [],
+      "timeoutMs": 30000,
+      "toolPolicy": {
+        "default": "allow"
+      }
+    },
+    "blender": {
+      "transport": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://projects.blender.org/lab/blender_mcp.git@v1.0.3#subdirectory=mcp",
+        "blender-mcp",
+        "--transport",
+        "stdio"
+      ],
+      "env": {
+        "BLENDER_MCP_HOST": "127.0.0.1",
+        "BLENDER_MCP_PORT": "9876"
+      },
+      "timeoutMs": 30000,
+      "toolPolicy": {
+        "default": "allow"
+      }
+    },
+    "unity": {
+      "transport": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "mcpforunityserver",
+        "mcp-for-unity",
+        "--transport",
+        "stdio"
+      ],
+      "env": {
+        "DISABLE_TELEMETRY": "1"
+      },
+      "timeoutMs": 30000,
+      "toolPolicy": {
+        "default": "allow"
+      }
+    }
+  },
+  "upstream": {
+    "http": {
+      "enabled": false,
+      "host": "127.0.0.1",
+      "port": 8765,
+      "path": "/mcp"
+    }
+  }
+}
