@@ -1,4 +1,4 @@
-import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
+﻿import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import type { GatewayConfig, ProviderConfig } from "../config.js";
 import { selectProviders } from "../config.js";
@@ -55,9 +55,18 @@ export class ProviderManager {
   private async connectOne(runtime: ProviderRuntime): Promise<void> {
     runtime.state = "connecting";
     runtime.lastError = undefined;
+    let client: Client | undefined;
+    let transport: StdioClientTransport | StreamableHTTPClientTransport | undefined;
     try {
-      const client = new Client({ name: "vgate-" + runtime.id, version: "0.1.0" });
-      let transport: StdioClientTransport | StreamableHTTPClientTransport;
+      client = new Client(
+        { name: "vgate-" + runtime.id, version: "0.1.0" },
+        {
+          versionNegotiation: {
+            mode: "auto",
+            probe: { timeoutMs: Math.min(runtime.config.timeoutMs, 5000) }
+          }
+        }
+      );
       if (runtime.config.transport === "stdio") {
         transport = new StdioClientTransport({
           command: runtime.config.command,
@@ -71,8 +80,8 @@ export class ProviderManager {
         });
       }
 
-      await client.connect(transport);
-      const listed = await client.listTools();
+      await client.connect(transport, { timeout: runtime.config.timeoutMs });
+      const listed = await client.listTools(undefined, { timeout: runtime.config.timeoutMs });
       const tools: DiscoveredTool[] = [];
       const localNames = new Set<string>();
 
@@ -106,8 +115,9 @@ export class ProviderManager {
       runtime.state = "error";
       runtime.lastError = errorMessage(error);
       runtime.tools = [];
-      if (runtime.client) {
-        try { await runtime.client.close(); } catch {}
+      try { await client?.close(); } catch {}
+      if (!client) {
+        try { await transport?.close(); } catch {}
       }
       runtime.client = undefined;
       runtime.transport = undefined;
@@ -128,7 +138,10 @@ export class ProviderManager {
     if (!toolAllowed(route.downstreamName, runtime.config.toolPolicy)) {
       throw new Error("Route blocked by current provider policy: " + upstreamName);
     }
-    return runtime.client.callTool({ name: route.downstreamName, arguments: args });
+    return runtime.client.callTool(
+      { name: route.downstreamName, arguments: args },
+      { timeout: runtime.config.timeoutMs }
+    );
   }
 
   snapshot(): {
@@ -167,3 +180,4 @@ export class ProviderManager {
     await this.connectAll();
   }
 }
+
