@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+.vscode/
+.superpowers/
+vgate.local.json
+.env
+.env.*
+*.local.json
+*.secret
+runtime/
+logs/
+local-secrets/
+tunnel-client.exe
+mcp-conf.yaml
+mcp-conf*.yaml
+*.local.yaml
