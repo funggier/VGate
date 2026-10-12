@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "providers": {
+    "fixture": {
+      "transport": "stdio",
+      "command": "${env:VGATE_TEST_NODE}",
+      "args": ["--import", "tsx", "tests/fixtures/stdio-provider.ts"],
+      "timeoutMs": 3000
+    }
+  }
+}

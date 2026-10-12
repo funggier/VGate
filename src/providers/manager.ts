@@ -1,4 +1,4 @@
-﻿import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
+import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import type { GatewayConfig, ProviderConfig } from "../config.js";
 import { selectProviders } from "../config.js";
@@ -17,6 +17,27 @@ export interface DiscoveredTool {
   annotations?: Record<string, unknown>;
 }
 
+export interface DiscoveredPrompt {
+  providerId: string;
+  downstreamName: string;
+  upstreamName: string;
+  title?: string;
+  description?: string;
+  arguments?: Array<{ name: string; description?: string; required?: boolean }>;
+}
+
+export interface DiscoveredResource {
+  providerId: string;
+  downstreamUri: string;
+  upstreamUri: string;
+  upstreamName: string;
+  title?: string;
+  description?: string;
+  mimeType?: string;
+  size?: number;
+  annotations?: Record<string, unknown>;
+}
+
 interface ProviderRuntime {
   id: string;
   config: ProviderConfig;
@@ -24,6 +45,9 @@ interface ProviderRuntime {
   client?: Client;
   transport?: { close(): Promise<void> };
   tools: DiscoveredTool[];
+  prompts: DiscoveredPrompt[];
+  resources: DiscoveredResource[];
+  resourceTemplateCount: number;
   lastError?: string;
 }
 
@@ -36,20 +60,26 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+function upstreamResourceUri(providerId: string, downstreamUri: string): string {
+  return "vgate://" + providerId + "/" + encodeURIComponent(downstreamUri);
+}
+
 export class ProviderManager {
   private readonly runtimes = new Map<string, ProviderRuntime>();
   private readonly routes = new Map<string, DiscoveredTool>();
+  private readonly promptRoutes = new Map<string, DiscoveredPrompt>();
+  private readonly resourceRoutes = new Map<string, DiscoveredResource>();
 
   constructor(private readonly config: GatewayConfig) {
     for (const [id, provider] of selectProviders(config)) {
-      this.runtimes.set(id, { id, config: provider, state: "disabled", tools: [] });
+      this.runtimes.set(id, {
+        id, config: provider, state: "disabled", tools: [], prompts: [], resources: [], resourceTemplateCount: 0
+      });
     }
   }
 
   async connectAll(): Promise<void> {
-    for (const runtime of this.runtimes.values()) {
-      await this.connectOne(runtime);
-    }
+    for (const runtime of this.runtimes.values()) await this.connectOne(runtime);
   }
 
   private async connectOne(runtime: ProviderRuntime): Promise<void> {
@@ -60,13 +90,9 @@ export class ProviderManager {
     try {
       client = new Client(
         { name: "vgate-" + runtime.id, version: "0.1.0" },
-        {
-          versionNegotiation: {
-            mode: "auto",
-            probe: { timeoutMs: Math.min(runtime.config.timeoutMs, 5000) }
-          }
-        }
+        { versionNegotiation: { mode: "auto", probe: { timeoutMs: Math.min(runtime.config.timeoutMs, 5000) } } }
       );
+
       if (runtime.config.transport === "stdio") {
         transport = new StdioClientTransport({
           command: runtime.config.command,
@@ -80,8 +106,14 @@ export class ProviderManager {
         });
       }
 
-      await client.connect(transport, { timeout: runtime.config.timeoutMs });
-      const listed = await client.listTools(undefined, { timeout: runtime.config.timeoutMs });
+      await client.connect(transport, { timeout: runtime.config.timeoutMs, maxTotalTimeout: runtime.config.timeoutMs });
+      const capabilities = client.getServerCapabilities();
+
+      const listed = await client.listTools(undefined, {
+        timeout: runtime.config.timeoutMs,
+        maxTotalTimeout: runtime.config.timeoutMs,
+        cacheMode: "refresh"
+      });
       const tools: DiscoveredTool[] = [];
       const localNames = new Set<string>();
 
@@ -107,14 +139,102 @@ export class ProviderManager {
         this.routes.set(upstreamName, discovered);
       }
 
+      const prompts: DiscoveredPrompt[] = [];
+      if (capabilities?.prompts) {
+        const listedPrompts = await client.listPrompts(undefined, {
+          timeout: runtime.config.timeoutMs,
+          maxTotalTimeout: runtime.config.timeoutMs,
+          cacheMode: "refresh"
+        });
+        for (const prompt of listedPrompts.prompts) {
+          const upstreamName = makeUpstreamName(runtime.id, prompt.name);
+          if (this.promptRoutes.has(upstreamName)) {
+            runtime.state = "degraded";
+            runtime.lastError = "Prompt collision for " + upstreamName;
+            continue;
+          }
+          const discovered: DiscoveredPrompt = {
+            providerId: runtime.id,
+            downstreamName: prompt.name,
+            upstreamName,
+            title: prompt.title,
+            description: prompt.description,
+            arguments: prompt.arguments?.map((arg) => ({
+              name: arg.name,
+              description: arg.description,
+              required: arg.required
+            }))
+          };
+          prompts.push(discovered);
+          this.promptRoutes.set(upstreamName, discovered);
+        }
+      }
+
+      const resources: DiscoveredResource[] = [];
+      let resourceTemplateCount = 0;
+      if (capabilities?.resources) {
+        const listedResources = await client.listResources(undefined, {
+          timeout: runtime.config.timeoutMs,
+          maxTotalTimeout: runtime.config.timeoutMs,
+          cacheMode: "refresh"
+        });
+        for (const resource of listedResources.resources) {
+          const upstreamName = makeUpstreamName(runtime.id, resource.name);
+          const upstreamUri = upstreamResourceUri(runtime.id, resource.uri);
+          if (this.resourceRoutes.has(upstreamUri)) {
+            runtime.state = "degraded";
+            runtime.lastError = "Resource collision for " + upstreamUri;
+            continue;
+          }
+          const discovered: DiscoveredResource = {
+            providerId: runtime.id,
+            downstreamUri: resource.uri,
+            upstreamUri,
+            upstreamName,
+            title: resource.title,
+            description: resource.description,
+            mimeType: resource.mimeType,
+            size: resource.size,
+            annotations: resource.annotations as Record<string, unknown> | undefined
+          };
+          resources.push(discovered);
+          this.resourceRoutes.set(upstreamUri, discovered);
+        }
+        try {
+          const templates = await client.listResourceTemplates(undefined, {
+            timeout: runtime.config.timeoutMs,
+            maxTotalTimeout: runtime.config.timeoutMs,
+            cacheMode: "refresh"
+          });
+          resourceTemplateCount = templates.resourceTemplates.length;
+        } catch {
+          resourceTemplateCount = 0;
+        }
+      }
+
       runtime.client = client;
       runtime.transport = transport;
       runtime.tools = tools;
+      runtime.prompts = prompts;
+      runtime.resources = resources;
+      runtime.resourceTemplateCount = resourceTemplateCount;
       if (runtime.state !== "degraded") runtime.state = "ready";
     } catch (error) {
+      for (const [name, route] of this.routes) {
+        if (route.providerId === runtime.id) this.routes.delete(name);
+      }
+      for (const [name, route] of this.promptRoutes) {
+        if (route.providerId === runtime.id) this.promptRoutes.delete(name);
+      }
+      for (const [uri, route] of this.resourceRoutes) {
+        if (route.providerId === runtime.id) this.resourceRoutes.delete(uri);
+      }
       runtime.state = "error";
       runtime.lastError = errorMessage(error);
       runtime.tools = [];
+      runtime.prompts = [];
+      runtime.resources = [];
+      runtime.resourceTemplateCount = 0;
       try { await client?.close(); } catch {}
       if (!client) {
         try { await transport?.close(); } catch {}
@@ -126,6 +246,14 @@ export class ProviderManager {
 
   listTools(): DiscoveredTool[] {
     return [...this.routes.values()].sort((a, b) => a.upstreamName.localeCompare(b.upstreamName));
+  }
+
+  listPrompts(): DiscoveredPrompt[] {
+    return [...this.promptRoutes.values()].sort((a, b) => a.upstreamName.localeCompare(b.upstreamName));
+  }
+
+  listResources(): DiscoveredResource[] {
+    return [...this.resourceRoutes.values()].sort((a, b) => a.upstreamName.localeCompare(b.upstreamName));
   }
 
   async callTool(upstreamName: string, args: Record<string, unknown>): Promise<any> {
@@ -140,8 +268,34 @@ export class ProviderManager {
     }
     return runtime.client.callTool(
       { name: route.downstreamName, arguments: args },
-      { timeout: runtime.config.timeoutMs }
+      { timeout: runtime.config.timeoutMs, maxTotalTimeout: runtime.config.timeoutMs }
     );
+  }
+
+  async getPrompt(upstreamName: string, args: Record<string, string>): Promise<any> {
+    const route = this.promptRoutes.get(upstreamName);
+    if (!route) throw new Error("Unknown or stale VGate prompt route: " + upstreamName);
+    const runtime = this.runtimes.get(route.providerId);
+    if (!runtime?.client) throw new Error("Provider is not ready for prompt: " + upstreamName);
+    return runtime.client.getPrompt(
+      { name: route.downstreamName, arguments: args },
+      { timeout: runtime.config.timeoutMs, maxTotalTimeout: runtime.config.timeoutMs }
+    );
+  }
+
+  async readResource(upstreamUri: string): Promise<any> {
+    const route = this.resourceRoutes.get(upstreamUri);
+    if (!route) throw new Error("Unknown or stale VGate resource route: " + upstreamUri);
+    const runtime = this.runtimes.get(route.providerId);
+    if (!runtime?.client) throw new Error("Provider is not ready for resource: " + upstreamUri);
+    const result = await runtime.client.readResource(
+      { uri: route.downstreamUri },
+      { timeout: runtime.config.timeoutMs, maxTotalTimeout: runtime.config.timeoutMs, cacheMode: "refresh" }
+    );
+    return {
+      ...result,
+      contents: result.contents.map((content) => ({ ...content, uri: upstreamUri }))
+    };
   }
 
   snapshot(): {
@@ -150,6 +304,9 @@ export class ProviderManager {
       state: ProviderStateName;
       transport: "stdio" | "http";
       toolCount: number;
+      promptCount: number;
+      resourceCount: number;
+      resourceTemplateCount: number;
       lastError?: string;
     }>;
   } {
@@ -159,6 +316,9 @@ export class ProviderManager {
         state: runtime.state,
         transport: runtime.config.transport,
         toolCount: runtime.tools.length,
+        promptCount: runtime.prompts.length,
+        resourceCount: runtime.resources.length,
+        resourceTemplateCount: runtime.resourceTemplateCount,
         lastError: runtime.lastError
       }]))
     };
@@ -166,11 +326,16 @@ export class ProviderManager {
 
   async close(): Promise<void> {
     this.routes.clear();
+    this.promptRoutes.clear();
+    this.resourceRoutes.clear();
     for (const runtime of this.runtimes.values()) {
       try { await runtime.client?.close(); } catch {}
       runtime.client = undefined;
       runtime.transport = undefined;
       runtime.tools = [];
+      runtime.prompts = [];
+      runtime.resources = [];
+      runtime.resourceTemplateCount = 0;
       runtime.state = "disabled";
     }
   }
@@ -180,4 +345,3 @@ export class ProviderManager {
     await this.connectAll();
   }
 }
-
