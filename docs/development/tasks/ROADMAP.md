@@ -7,9 +7,9 @@
 | VG-003 | Downstream stdio/HTTP discovery and routing | DONE |
 | VG-004 | Upstream federation, refresh, resources/prompts, health | DONE |
 | VG-005 | Current tunnel bootstrap migration + self-restart | DONE |
-| VG-006 | Full qualification, CI, GitHub delivery | ACTIVE |
+| VG-006 | Full qualification, CI, GitHub delivery | DONE |
 
-## Live qualification snapshot — 2026-10-13
+## v0.1.0 closure — 2026-10-13
 
 - Local unit/integration/E2E: 15/15 tests PASS.
 - TypeScript typecheck: PASS.
@@ -23,4 +23,8 @@
   - Roblox: ready, 30 tools; real Studio discovery passed.
   - Blender: ready, 26 tools; real Blender calls passed.
   - Unity: ready, 48 tools, 18 static resources, 6 resource templates; real Unity Editor call passed.
-- Remaining gate: exact-commit GitHub Actions, merge to main, exact-main/live verification, issue closure.
+- Exact qualified implementation SHA: `cff83dc54fb5710de598ebb8949360d57d3f75bc`.
+- GitHub Actions exact-SHA qualification: run `38323222718` / job `qualify` — SUCCESS.
+- `main` was fast-forwarded to the exact qualified implementation SHA before this closure record.
+
+Future work must start with a new task ID beyond VG-006.
