@@ -13,8 +13,10 @@
   "providers": {
     "roblox": {
       "transport": "stdio",
-      "command": "${env:LOCALAPPDATA}\\Roblox\\mcp.bat",
-      "args": [],
+      "command": "node",
+      "args": [
+        "examples/providers/roblox-mcp-launcher.mjs"
+      ],
       "timeoutMs": 30000,
       "toolPolicy": {
         "default": "allow"
@@ -44,7 +46,7 @@
       "command": "uvx",
       "args": [
         "--from",
-        "mcpforunityserver",
+        "mcpforunityserver==10.3.0",
         "mcp-for-unity",
         "--transport",
         "stdio"

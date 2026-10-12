@@ -80,9 +80,9 @@ Environment references use `${env:NAME}`. Provider IDs become namespaces; for ex
 
 The example profile includes three independent MCP providers:
 
-- **Roblox Studio** — official `%LOCALAPPDATA%\Roblox\mcp.bat`
+- **Roblox Studio** — official `StudioMCP.exe`; the included launcher resolves the newest installed Roblox Studio version at runtime so updates do not hard-code a version directory
 - **Blender** — Blender Lab MCP server paired with the Blender MCP add-on; the example uses Blender MCP v1.0.3 and the add-on bridge on localhost:9876
-- **Unity** — `mcpforunityserver` over stdio; editor-dependent operations require the matching Unity MCP package/editor bridge to be active
+- **Unity** — `mcpforunityserver==10.3.0` over stdio; editor-dependent operations require the matching Unity MCP package/editor bridge to be active. On Windows, choose an editor bridge port outside OS excluded TCP ranges.
 
 These are configuration examples, not hard-coded VGate integrations. Any compatible MCP server can be added without changing VGate core.
 
@@ -97,7 +97,7 @@ Restart-VGate.cmd
 Status-VGate.cmd
 ```
 
-The active tunnel profile `mcp-conf.yaml`, `tunnel-client.exe`, `vgate.local.json`, encrypted credentials, runtime state, and logs are local-only and excluded from Git.
+The active tunnel profile `mcp-conf.yaml`, `tunnel-client.exe`, `vgate.local.json`, encrypted credentials, runtime state, and logs are local-only and excluded from Git. `Restart-VGate.cmd` launches a detached worker so the current tunnel can disconnect and be brought back even when the restart originated from the connection being replaced.
 
 ## Security
 
