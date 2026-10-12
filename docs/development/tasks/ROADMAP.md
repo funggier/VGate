@@ -15,10 +15,12 @@
 - TypeScript typecheck: PASS.
 - Production build: PASS.
 - npm audit: 0 vulnerabilities.
+- Production artifact: 107 upstream tools, 18 static resources.
 - Current ChatGPT tunnel target: `node "dist/server-stdio.js"`.
-- tunnel-client health: live/ready/control-plane PASS.
+- tunnel-client: liveness PASS, readiness PASS, control-plane PASS.
+- Detached self-restart: PASS.
 - Real downstream profile `game-dev`:
-  - Roblox: ready, 30 tools.
-  - Blender: ready, 26 tools.
-  - Unity: ready, 48 tools, 18 static resources, 6 resource templates detected.
-- Remaining gate: push exact commit, observe GitHub Actions on that commit, merge to main, then re-run runtime verification.
+  - Roblox: ready, 30 tools; real Studio discovery passed.
+  - Blender: ready, 26 tools; real Blender calls passed.
+  - Unity: ready, 48 tools, 18 static resources, 6 resource templates; real Unity Editor call passed.
+- Remaining gate: exact-commit GitHub Actions, merge to main, exact-main/live verification, issue closure.
