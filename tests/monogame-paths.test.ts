@@ -15,8 +15,8 @@ describe("MonoGame project path sandbox", () => {
 
     try {
       expect(resolveAllowedPath(root, child)).toBe(child);
-      expect(resolveAllowedPath(root, ".\\Qualification")).toBe(child);
-      expect(() => resolveAllowedPath(root, "..\\games-escape")).toThrow(/outside allowed root/i);
+      expect(resolveAllowedPath(root, join(".", "Qualification"))).toBe(child);
+      expect(() => resolveAllowedPath(root, join("..", "games-escape"))).toThrow(/outside allowed root/i);
       expect(() => resolveAllowedPath(root, sibling)).toThrow(/outside allowed root/i);
       expect(() => resolveAllowedPath(root, root + "-escape")).toThrow(/outside allowed root/i);
     } finally {
