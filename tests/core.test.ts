@@ -1,5 +1,8 @@
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, test } from "vitest";
-import { parseGatewayConfig, selectProviders, resolveEnvRefs } from "../src/config.js";
+import { loadGatewayConfig, parseGatewayConfig, selectProviders, resolveEnvRefs } from "../src/config.js";
 import { makeUpstreamName } from "../src/namespace.js";
 import { toolAllowed } from "../src/policy.js";
 
@@ -30,6 +33,19 @@ describe("gateway config", () => {
     const missingRef = "$" + "{env:MISSING}";
     expect(resolveEnvRefs("Bearer " + tokenRef, { TOKEN: "abc" })).toBe("Bearer abc");
     expect(() => resolveEnvRefs(missingRef, {})).toThrow(/MISSING/);
+  });
+
+  test("loads a UTF-8 BOM-prefixed local JSON config", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "vgate-bom-"));
+    const file = join(dir, "vgate.local.json");
+    try {
+      await writeFile(file, String.fromCharCode(0xfeff) + JSON.stringify({ version: 1, providers: {} }), "utf8");
+      const config = await loadGatewayConfig(file);
+      expect(config.version).toBe(1);
+      expect(config.providers).toEqual({});
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
 
