@@ -7,7 +7,8 @@
         "roblox",
         "blender",
         "unity",
-        "godot"
+        "godot",
+        "monogame"
       ]
     }
   },
@@ -71,6 +72,20 @@
         "GODOT_MCP_CONFIG_VERSION": "1"
       },
       "timeoutMs": 60000,
+      "toolPolicy": {
+        "default": "allow"
+      }
+    },
+    "monogame": {
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "dist/providers/monogame/server.js"
+      ],
+      "env": {
+        "MONOGAME_MCP_ALLOWED_ROOT": "${env:MONOGAME_MCP_ALLOWED_ROOT}"
+      },
+      "timeoutMs": 120000,
       "toolPolicy": {
         "default": "allow"
       }
