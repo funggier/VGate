@@ -14,7 +14,7 @@ ChatGPT / MCP Host
         |
    +----+--------+--------+
    |             |        |
- Roblox MCP   Blender   Unity MCP   ...
+ Roblox MCP   Blender   Unity MCP   Godot MCP   ...
 ```
 
 VGate does not contain an LLM. The upstream agent decides what to do; VGate discovers capabilities and routes each MCP operation to the correct provider.
@@ -78,11 +78,13 @@ Environment references use `${env:NAME}`. Provider IDs become namespaces; for ex
 
 ## Game-development providers
 
-The example profile includes three independent MCP providers:
+The example profile includes four independent MCP providers:
 
 - **Roblox Studio** — official `StudioMCP.exe`; the included launcher resolves the newest installed Roblox Studio version at runtime so updates do not hard-code a version directory
 - **Blender** — Blender Lab MCP server paired with the Blender MCP add-on; the example uses Blender MCP v1.0.3 and the add-on bridge on localhost:9876
 - **Unity** — `mcpforunityserver==10.3.0` over stdio; editor-dependent operations require the matching Unity MCP package/editor bridge to be active. On Windows, choose an editor bridge port outside OS excluded TCP ranges.
+
+- **Godot** — pinned `@npgamedev/godot-mcp-server@1.0.3` stdio bridge. The bridge can be discovered while the editor is offline; live editor operations require the Godot MCP Toolkit plugin enabled in the target Godot 4.2+ project. On Windows, production config wraps `npx` with `cmd.exe /d /c`.
 
 These are configuration examples, not hard-coded VGate integrations. Any compatible MCP server can be added without changing VGate core.
 
@@ -97,7 +99,7 @@ Restart-VGate.cmd
 Status-VGate.cmd
 ```
 
-The active tunnel profile `mcp-conf.yaml`, `tunnel-client.exe`, `vgate.local.json`, encrypted credentials, runtime state, and logs are local-only and excluded from Git. `Restart-VGate.cmd` launches a detached worker so the current tunnel can disconnect and be brought back even when the restart originated from the connection being replaced.
+The active tunnel profile `mcp-conf.yaml`, `tunnel-client.exe`, `vgate.local.json`, encrypted credentials, runtime state, and logs are local-only and excluded from Git. `Restart-VGate.cmd` launches a detached worker so the current tunnel can disconnect and be brought back even when the restart originated from the connection being replaced. `Status-VGate.cmd` and `Stop-VGate.cmd` keep their result visible by default; automation can use `--no-hold` to return immediately while preserving the underlying PowerShell exit code.
 
 ## Security
 

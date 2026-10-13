@@ -6,7 +6,8 @@
       "providers": [
         "roblox",
         "blender",
-        "unity"
+        "unity",
+        "godot"
       ]
     }
   },
@@ -55,6 +56,18 @@
         "DISABLE_TELEMETRY": "1"
       },
       "timeoutMs": 30000,
+      "toolPolicy": {
+        "default": "allow"
+      }
+    },
+    "godot": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@npgamedev/godot-mcp-server@1.0.3"
+      ],
+      "timeoutMs": 60000,
       "toolPolicy": {
         "default": "allow"
       }

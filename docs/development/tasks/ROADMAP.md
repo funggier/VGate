@@ -8,6 +8,7 @@
 | VG-004 | Upstream federation, refresh, resources/prompts, health | DONE |
 | VG-005 | Current tunnel bootstrap migration + self-restart | DONE |
 | VG-006 | Full qualification, CI, GitHub delivery | DONE |
+| VG-007 | Godot provider + Status/Stop console hold | ACTIVE |
 
 ## v0.1.0 closure — 2026-10-13
 
@@ -27,4 +28,4 @@
 - GitHub Actions exact-SHA qualification: run `38323222718` / job `qualify` — SUCCESS.
 - `main` was fast-forwarded to the exact qualified implementation SHA before this closure record.
 
-Future work must start with a new task ID beyond VG-006.
+VG-007 is active: add pinned Godot MCP federation and operator-console hold UX without regressing the v0.1.0 baseline.
