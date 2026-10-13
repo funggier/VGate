@@ -10,6 +10,7 @@
 | VG-006 | Full qualification, CI, GitHub delivery | DONE |
 | VG-007 | Godot provider + Status/Stop console hold | DONE |
 | VG-008 | v0.1.1 Godot Integration Release | DONE / PUBLISHED / LIVE GREEN |
+| VG-009 | MonoGame Provider Discovery & Integration | PLANNED |
 
 ## v0.1.0 closure — 2026-10-13
 
