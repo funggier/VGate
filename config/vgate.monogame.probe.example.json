@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "activeProfile": "monogame-probe",
+  "profiles": {
+    "monogame-probe": {
+      "providers": ["monogame"]
+    }
+  },
+  "providers": {
+    "monogame": {
+      "transport": "stdio",
+      "command": "node",
+      "args": ["dist/providers/monogame/server.js"],
+      "env": {
+        "MONOGAME_MCP_ALLOWED_ROOT": "${env:MONOGAME_MCP_ALLOWED_ROOT}"
+      },
+      "timeoutMs": 120000,
+      "toolPolicy": {
+        "default": "allow"
+      }
+    }
+  }
+}

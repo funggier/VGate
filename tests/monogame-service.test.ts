@@ -94,4 +94,23 @@ describe("MonoGameService", () => {
       await rm(root, { recursive: true, force: true });
     }
   });
-});
+
+  test("prefers DesktopGL as the deterministic primary project in multi-platform roots", async () => {
+    const root = await mkdtemp(join(tmpdir(), "vgate-mg-multi-"));
+    const game = join(root, "Game");
+    await mkdir(join(game, "Game.Android"), { recursive: true });
+    await mkdir(join(game, "Game.DesktopGL"), { recursive: true });
+    await writeFile(join(game, "Game.Android", "Game.Android.csproj"), '<Project><ItemGroup><PackageReference Include="MonoGame.Framework.Android" Version="3.8.6" /></ItemGroup></Project>');
+    await writeFile(join(game, "Game.DesktopGL", "Game.DesktopGL.csproj"), '<Project><ItemGroup><PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.6" /></ItemGroup></Project>');
+    const calls: ProcessSpec[] = [];
+    const service = new MonoGameService({
+      allowedRoot: root,
+      runProcess: async (spec) => { calls.push(spec); return ok(); }
+    });
+    try {
+      await service.buildProject(game);
+      expect(calls[0]?.args[1]).toMatch(/Game\.DesktopGL\.csproj$/i);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });});

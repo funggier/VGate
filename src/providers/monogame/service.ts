@@ -160,8 +160,12 @@ export class MonoGameService {
 
   private async primaryProject(projectPath: string): Promise<string> {
     const inspected = await this.inspectProject(projectPath);
-    const nonContent = inspected.projects.find((p) => !p.packageReferences.some((pkg) => pkg.id === "MonoGame.Framework.Content.Pipeline"));
-    return (nonContent ?? inspected.projects[0])!.path;
+    const runnable = inspected.projects.filter((p) => !p.packageReferences.some((pkg) => pkg.id === "MonoGame.Framework.Content.Pipeline"));
+    const desktopGl = runnable.find((p) =>
+      /\.DesktopGL\.csproj$/i.test(p.path) ||
+      p.packageReferences.some((pkg) => pkg.id === "MonoGame.Framework.DesktopGL")
+    );
+    return (desktopGl ?? runnable[0] ?? inspected.projects[0])!.path;
   }
 
   async createProject(input: CreateProjectInput): Promise<ProcessResult> {
