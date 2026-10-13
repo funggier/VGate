@@ -12,14 +12,16 @@ ChatGPT / MCP Host
   namespace / policy
   health / refresh
         |
-   +----+--------+--------+
-   |             |        |
- Roblox MCP   Blender   Unity MCP   Godot MCP   ...
+   +----+--------+--------+--------+
+   |             |        |        |
+ Roblox MCP   Blender   Unity MCP   Godot MCP   MonoGame
 ```
 
 VGate does not contain an LLM. The upstream agent decides what to do; VGate discovers capabilities and routes each MCP operation to the correct provider.
 
 ## Current baseline
+
+- Release baseline: v0.1.2
 
 - Node.js 20+ / TypeScript
 - MCP TypeScript SDK v2

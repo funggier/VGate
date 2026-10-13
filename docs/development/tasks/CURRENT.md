@@ -1,25 +1,29 @@
 # Current Task
 
-**Task:** None
-**Status:** NO ACTIVE TASK
+Task: VG-010 — VGate v0.1.2 MonoGame Integration Release
+Status: ACTIVE / RELEASE PREPARATION
 
-## Closed baseline
+## Objective
 
-VG-001 through VG-009 are complete.
+Publish the completed VG-009 MonoGame integration as immutable release v0.1.2 using the Evidence Release Workflow.
 
-Latest closure:
+## Release identity
 
-- VG-009 MonoGame Provider Discovery & Integration: DONE / DEPLOYED / LIVE GREEN.
-- Exact qualified implementation SHA: c099d3a82391562a216416ede6028e1ada9cd6c0.
-- Main CI #16 / run 38399029024: SUCCESS on the exact implementation SHA.
-- Production VGate profile game-dev:
-  - Roblox: ready / 30 tools
-  - Blender: ready / 26 tools
-  - Unity: ready / 48 tools / 18 resources / 6 resource templates
-  - Godot: ready / 36 tools / 2 prompts / 4 resources
-  - MonoGame: ready / 7 tools
-- Tunnel liveness/readiness/control-plane: PASS.
-- MonoGame physical project/content build qualification: PASS.
-- Qualification report: docs/development/reports/VGATE-20261013-VG-009-qualification.md.
+- version: 0.1.2
+- tag: v0.1.2
+- release type: stable patch release
+- source branch: main
+- activation HEAD: 935e1d472f7a7debbf78e4083f3df90b48566f5e
+- previous releases v0.1.0 and v0.1.1 remain immutable
 
-The v0.1.0 and v0.1.1 release baselines remain unchanged. No v0.1.2 release was created by VG-009.
+## Required evidence
+
+- full local qualification
+- exact release-commit CI
+- production runtime 0.1.2 with all five providers ready
+- release/document ZIPs built from exact tagged source
+- SHA256 manifest and download-back verification
+- GitHub Release publication
+- docs-only post-release closure without moving v0.1.2
+
+Task file: docs/development/tasks/VG-010-v0.1.2-release.md
