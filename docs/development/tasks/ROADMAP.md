@@ -11,7 +11,7 @@
 | VG-007 | Godot provider + Status/Stop console hold | DONE |
 | VG-008 | v0.1.1 Godot Integration Release | DONE / PUBLISHED / LIVE GREEN |
 | VG-009 | MonoGame Provider Discovery & Integration | DONE / DEPLOYED / LIVE GREEN |
-| VG-010 | v0.1.2 MonoGame Integration Release | ACTIVE / RELEASE PREPARATION |
+| VG-010 | v0.1.2 MonoGame Integration Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 
 ## v0.1.0 closure Ã¢â‚¬â€ 2026-10-13
 
@@ -45,3 +45,16 @@ VG-007 is COMPLETE / DEPLOYED / LIVE GREEN: Godot is federated into `game-dev` a
 - Tunnel liveness/readiness/control-plane: PASS.
 - Existing v0.1.0/v0.1.1 tags/releases unchanged; no v0.1.2 release created.
 - Report: docs/development/reports/VGATE-20261013-VG-009-qualification.md.
+
+## v0.1.2 closure - 2026-10-13
+
+- VG-010 COMPLETE / PUBLISHED / DEPLOYED / LIVE GREEN.
+- exact release commit: 01de70a6325aab2ecdb2d13e21e34fe00107ddd9.
+- exact release CI: #18 / run 38402089475 / SUCCESS.
+- annotated tag object: b6621674f708e46bf077dd3ae2dabc6fdc741106.
+- GitHub Release: https://github.com/funggier/VGate/releases/tag/v0.1.2.
+- repository visibility: PUBLIC.
+- production runtime: VGate 0.1.2 with five providers ready.
+- release artifacts and download-back SHA-256 verification: PASS / mismatch count 0.
+- v0.1.0 and v0.1.1 remain unchanged.
+- report: docs/development/reports/VGATE-20261013-v0.1.2-release.md.
