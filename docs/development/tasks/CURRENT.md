@@ -1,7 +1,7 @@
 # Current Task
 
 **Task:** VG-008 — VGate v0.1.1 Godot Integration Release
-**Status:** ACTIVE
+**Status:** DONE / PUBLISHED / DEPLOYED / LIVE GREEN
 
 ## Closed baseline
 
@@ -26,4 +26,4 @@ VG-001 through VG-006 are complete.
 - GitHub Actions PR run `38323222718` completed successfully on exact qualified SHA `cff83dc54fb5710de598ebb8949360d57d3f75bc`.
 - Qualification evidence: `docs/development/reports/VGATE-20261013-v0.1.0-qualification.md`.
 
-The v0.1.0 baseline remains closed and immutable. VG-007 is COMPLETE / DEPLOYED / LIVE GREEN. VG-008 is ACTIVE to publish the current qualified mainline as immutable patch release v0.1.1.
+The v0.1.0 baseline remains closed and immutable. VG-007 is COMPLETE / DEPLOYED / LIVE GREEN. VG-008 is COMPLETE / PUBLISHED / DEPLOYED / LIVE GREEN as v0.1.1. No active development task remains.

@@ -9,7 +9,7 @@
 | VG-005 | Current tunnel bootstrap migration + self-restart | DONE |
 | VG-006 | Full qualification, CI, GitHub delivery | DONE |
 | VG-007 | Godot provider + Status/Stop console hold | DONE |
-| VG-008 | v0.1.1 Godot Integration Release | ACTIVE |
+| VG-008 | v0.1.1 Godot Integration Release | DONE / PUBLISHED / LIVE GREEN |
 
 ## v0.1.0 closure — 2026-10-13
 
@@ -29,4 +29,4 @@
 - GitHub Actions exact-SHA qualification: run `38323222718` / job `qualify` — SUCCESS.
 - `main` was fast-forwarded to the exact qualified implementation SHA before this closure record.
 
-VG-007 is COMPLETE / DEPLOYED / LIVE GREEN: Godot is federated into `game-dev` at 36 tools / 2 prompts / 4 resources; Status/Stop wrappers hold results reliably; BOM-prefixed local config is tolerated; exact CI runs #5 and #6 succeeded. VG-008 is ACTIVE to package and publish this state as v0.1.1.
+VG-007 is COMPLETE / DEPLOYED / LIVE GREEN: Godot is federated into `game-dev` at 36 tools / 2 prompts / 4 resources; Status/Stop wrappers hold results reliably; BOM-prefixed local config is tolerated. VG-008 is COMPLETE / PUBLISHED / DEPLOYED / LIVE GREEN as v0.1.1 at release commit `1fcb0b577ac6da091a451d44bd283210522072c8`, CI #8 SUCCESS, with clean-install/overlay/download-back qualification PASS. Report: `docs/development/reports/VGATE-20261013-v0.1.1-release.md`.
