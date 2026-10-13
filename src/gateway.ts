@@ -41,7 +41,7 @@ function resourceMetadata(resource: DiscoveredResource): Record<string, unknown>
 }
 
 export function createGatewayServer(manager: ProviderManager): GatewayServerBundle {
-  const server = new McpServer({ name: "VGate", version: "0.1.0" });
+  const server = new McpServer({ name: "VGate", version: "0.1.1" });
   const proxiedTools = new Map<string, RegisteredTool>();
   const proxiedPrompts = new Map<string, RegisteredPrompt>();
   const proxiedResources = new Map<string, RegisteredResource>();
@@ -150,7 +150,7 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
     description: "Return VGate gateway and downstream provider health.",
     inputSchema: z.object({})
   }, async () => statusResult({
-    gateway: { name: "VGate", version: "0.1.0" },
+    gateway: { name: "VGate", version: "0.1.1" },
     ...manager.snapshot()
   }));
 

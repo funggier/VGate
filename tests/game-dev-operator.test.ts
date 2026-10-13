@@ -23,6 +23,7 @@ describe("game-dev provider example", () => {
       transport: "stdio",
       command: "npx",
       args: ["-y", "@npgamedev/godot-mcp-server@1.0.3"],
+      env: { GODOT_MCP_CONFIG_VERSION: "1" },
       timeoutMs: 60000,
       toolPolicy: { default: "allow" }
     });

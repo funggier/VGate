@@ -84,7 +84,7 @@ The example profile includes four independent MCP providers:
 - **Blender** — Blender Lab MCP server paired with the Blender MCP add-on; the example uses Blender MCP v1.0.3 and the add-on bridge on localhost:9876
 - **Unity** — `mcpforunityserver==10.3.0` over stdio; editor-dependent operations require the matching Unity MCP package/editor bridge to be active. On Windows, choose an editor bridge port outside OS excluded TCP ranges.
 
-- **Godot** — pinned `@npgamedev/godot-mcp-server@1.0.3` stdio bridge. The bridge can be discovered while the editor is offline; live editor operations require the Godot MCP Toolkit plugin enabled in the target Godot 4.2+ project. On Windows, production config wraps `npx` with `cmd.exe /d /c`.
+- **Godot** — pinned `@npgamedev/godot-mcp-server@1.0.3` stdio bridge. Live editor operations require the Godot MCP Toolkit plugin enabled in the target Godot 4.2+ project. Set `GODOT_MCP_CONFIG_VERSION=1`; when VGate runs outside the target project directory, set `GODOT_MCP_PROJECT_PATH` in local provider env to that project's absolute path so registry discovery selects the correct editor instance. On Windows, production config wraps `npx` with `cmd.exe /d /c`.
 
 These are configuration examples, not hard-coded VGate integrations. Any compatible MCP server can be added without changing VGate core.
 
