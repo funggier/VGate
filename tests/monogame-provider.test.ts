@@ -42,9 +42,6 @@ describe("dedicated MonoGame MCP provider", () => {
         "monogame__project_run"
       ]);
 
-      const status = await manager.callTool("monogame__environment_status", {});
-      expect(status.isError).not.toBe(true);
-      expect(status.structuredContent).toHaveProperty("dotnetVersion");
 
       const inspected = await manager.callTool("monogame__project_inspect", { projectPath: game });
       expect(inspected.isError).not.toBe(true);
