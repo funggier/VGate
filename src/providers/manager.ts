@@ -89,7 +89,7 @@ export class ProviderManager {
     let transport: StdioClientTransport | StreamableHTTPClientTransport | undefined;
     try {
       client = new Client(
-        { name: "vgate-" + runtime.id, version: "0.1.2" },
+        { name: "vgate-" + runtime.id, version: "0.1.3" },
         { versionNegotiation: { mode: "auto", probe: { timeoutMs: Math.min(runtime.config.timeoutMs, 5000) } } }
       );
 

@@ -21,7 +21,7 @@ VGate does not contain an LLM. The upstream agent decides what to do; VGate disc
 
 ## Current baseline
 
-- Release baseline: v0.1.2
+- Release target: v0.1.3 — Tunnel Settings & Conditional Read Cache
 
 - Node.js 20+ / TypeScript
 - MCP TypeScript SDK v2
@@ -76,19 +76,19 @@ Environment references use `${env:NAME}`. Provider IDs become namespaces; for ex
 
 ## Gateway control tools
 
-- `vgate_status` â€” current provider state and capability counts
-- `vgate_list_providers` â€” compact provider inventory
-- `vgate_refresh` â€” reconnect providers, rediscover capabilities, and reconcile the upstream surface
+- `vgate_status` — current provider state and capability counts
+- `vgate_list_providers` — compact provider inventory
+- `vgate_refresh` — reconnect providers, rediscover capabilities, and reconcile the upstream surface
 
 ## Game-development providers
 
 The example profile includes five independent MCP providers:
 
-- **Roblox Studio** â€” official `StudioMCP.exe`; the included launcher resolves the newest installed Roblox Studio version at runtime so updates do not hard-code a version directory
-- **Blender** â€” Blender Lab MCP server paired with the Blender MCP add-on; the example uses Blender MCP v1.0.3 and the add-on bridge on localhost:9876
-- **Unity** â€” `mcpforunityserver==10.3.0` over stdio; editor-dependent operations require the matching Unity MCP package/editor bridge to be active. On Windows, choose an editor bridge port outside OS excluded TCP ranges.
+- **Roblox Studio** — official `StudioMCP.exe`; the included launcher resolves the newest installed Roblox Studio version at runtime so updates do not hard-code a version directory
+- **Blender** — Blender Lab MCP server paired with the Blender MCP add-on; the example uses Blender MCP v1.0.3 and the add-on bridge on localhost:9876
+- **Unity** — `mcpforunityserver==10.3.0` over stdio; editor-dependent operations require the matching Unity MCP package/editor bridge to be active. On Windows, choose an editor bridge port outside OS excluded TCP ranges.
 
-- **Godot** â€” pinned `@npgamedev/godot-mcp-server@1.0.3` stdio bridge. Live editor operations require the Godot MCP Toolkit plugin enabled in the target Godot 4.2+ project. Set `GODOT_MCP_CONFIG_VERSION=1`; when VGate runs outside the target project directory, set `GODOT_MCP_PROJECT_PATH` in local provider env to that project's absolute path so registry discovery selects the correct editor instance. On Windows, production config wraps `npx` with `cmd.exe /d /c`.
+- **Godot** — pinned `@npgamedev/godot-mcp-server@1.0.3` stdio bridge. Live editor operations require the Godot MCP Toolkit plugin enabled in the target Godot 4.2+ project. Set `GODOT_MCP_CONFIG_VERSION=1`; when VGate runs outside the target project directory, set `GODOT_MCP_PROJECT_PATH` in local provider env to that project's absolute path so registry discovery selects the correct editor instance. On Windows, production config wraps `npx` with `cmd.exe /d /c`.
 
 - **MonoGame** — VGate-owned bounded stdio provider for MonoGame 3.8.6 project inspection, project/content build, controlled project creation and bounded run operations. Install `MonoGame.Templates.CSharp@3.8.6`, use .NET 10 (qualification baseline: 10.0.401), and set `MONOGAME_MCP_ALLOWED_ROOT` only in local environment/config to the parent directory containing allowed MonoGame projects. The provider supports the MonoGame 3.8.6 Content Builder workflow and detects legacy MGCB projects when present. VS Code can use the same CLI contracts; C# Dev Kit/C# are recommended and `r88.monogame` is optional.
 

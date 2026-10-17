@@ -1,4 +1,4 @@
-# VG-011 â€” Separated Tunnel Settings & Conditional Read Cache
+# VG-011 — Separated Tunnel Settings & Conditional Read Cache
 
 **Status:** COMPLETE / DEPLOYED / LIVE GREEN
 **Activated:** 2026-10-17

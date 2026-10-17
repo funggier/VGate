@@ -13,8 +13,9 @@
 | VG-009 | MonoGame Provider Discovery & Integration | DONE / DEPLOYED / LIVE GREEN |
 | VG-010 | v0.1.2 MonoGame Integration Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 | VG-011 | Separated Tunnel Settings & Conditional Read Cache | DONE / DEPLOYED / LIVE GREEN |
+| VG-012 | v0.1.3 Tunnel Settings & Conditional Read Cache Release | ACTIVE |
 
-## v0.1.0 closure Ã¢â‚¬â€ 2026-10-13
+## v0.1.0 closure — 2026-10-13
 
 - Local unit/integration/E2E: 15/15 tests PASS.
 - TypeScript typecheck: PASS.
@@ -29,7 +30,7 @@
   - Blender: ready, 26 tools; real Blender calls passed.
   - Unity: ready, 48 tools, 18 static resources, 6 resource templates; real Unity Editor call passed.
 - Exact qualified implementation SHA: `cff83dc54fb5710de598ebb8949360d57d3f75bc`.
-- GitHub Actions exact-SHA qualification: run `38323222718` / job `qualify` Ã¢â‚¬â€ SUCCESS.
+- GitHub Actions exact-SHA qualification: run `38323222718` / job `qualify` — SUCCESS.
 - `main` was fast-forwarded to the exact qualified implementation SHA before this closure record.
 
 VG-007 is COMPLETE / DEPLOYED / LIVE GREEN: Godot is federated into `game-dev` at 36 tools / 2 prompts / 4 resources; Status/Stop wrappers hold results reliably; BOM-prefixed local config is tolerated. VG-008 is COMPLETE / PUBLISHED / DEPLOYED / LIVE GREEN as v0.1.1 at release commit `1fcb0b577ac6da091a451d44bd283210522072c8`, CI #8 SUCCESS, with clean-install/overlay/download-back qualification PASS. Report: `docs/development/reports/VGATE-20261013-v0.1.1-release.md`.
@@ -59,3 +60,11 @@ VG-007 is COMPLETE / DEPLOYED / LIVE GREEN: Godot is federated into `game-dev` a
 - release artifacts and download-back SHA-256 verification: PASS / mismatch count 0.
 - v0.1.0 and v0.1.1 remain unchanged.
 - report: docs/development/reports/VGATE-20261013-v0.1.2-release.md.
+
+## v0.1.3 release candidate - 2026-10-17
+
+- VG-011 is COMPLETE / DEPLOYED / LIVE GREEN.
+- Release target: v0.1.3.
+- Public gateway control surface unchanged: vgate_status / vgate_list_providers / vgate_refresh.
+- Five-provider game-dev federation remains unchanged.
+- Release requires exact release-commit CI, live 0.1.3 activation, cache requalification, immutable tag and three checksum-verified assets.

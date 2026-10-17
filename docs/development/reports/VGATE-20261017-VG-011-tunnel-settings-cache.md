@@ -1,4 +1,4 @@
-# VG-011 â€” Separated Tunnel Settings & Conditional Read Cache
+# VG-011 — Separated Tunnel Settings & Conditional Read Cache
 
 **Date:** 2026-10-17
 **Status:** COMPLETE / DEPLOYED / LIVE GREEN
@@ -32,9 +32,9 @@ New operator commands:
 
 Clear modes:
 
-- `credential` â€” API key only
-- `connection` â€” Tunnel ID / Organization ID / health port + generated tunnel profile
-- `all` â€” credential + connection settings + generated runtime/log state
+- `credential` — API key only
+- `connection` — Tunnel ID / Organization ID / health port + generated tunnel profile
+- `all` — credential + connection settings + generated runtime/log state
 
 Existing combined VGate credentials remain readable for one-time migration. The deployed production credential was migrated successfully and rewritten as API-key-only.
 
@@ -148,7 +148,7 @@ Live conditional-cache evidence for `vgate_status`:
 
 This proves the end-to-end path:
 
-ChatGPT connector â†’ VGate control tool â†’ digest metadata cache â†’ duplicate payload suppression / optional safe execution skip.
+ChatGPT connector → VGate control tool → digest metadata cache → duplicate payload suppression / optional safe execution skip.
 
 ## Release boundary
 
