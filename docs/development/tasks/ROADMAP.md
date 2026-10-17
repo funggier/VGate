@@ -12,6 +12,7 @@
 | VG-008 | v0.1.1 Godot Integration Release | DONE / PUBLISHED / LIVE GREEN |
 | VG-009 | MonoGame Provider Discovery & Integration | DONE / DEPLOYED / LIVE GREEN |
 | VG-010 | v0.1.2 MonoGame Integration Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
+| VG-011 | Separated Tunnel Settings & Conditional Read Cache | ACTIVE |
 
 ## v0.1.0 closure Ã¢â‚¬â€ 2026-10-13
 

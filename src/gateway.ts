@@ -6,6 +6,7 @@ import {
   type RegisteredTool
 } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
+import { createConditionalReadCache } from "./conditional-read-cache.js";
 import type { DiscoveredPrompt, DiscoveredResource, ProviderManager } from "./providers/manager.js";
 
 export interface GatewayServerBundle {
@@ -19,6 +20,47 @@ function statusResult(payload: unknown) {
     content: [{ type: "text" as const, text }],
     structuredContent: payload as Record<string, unknown>
   };
+}
+
+const conditionalReadSchema = z.object({
+  known_digest: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
+  cache_max_age_ms: z.number().int().min(0).max(300000).optional()
+});
+
+type ConditionalReadArgs = z.infer<typeof conditionalReadSchema>;
+
+async function conditionalStatusResult(
+  cache: ReturnType<typeof createConditionalReadCache>,
+  cacheKey: string,
+  args: ConditionalReadArgs,
+  payloadFactory: () => Record<string, unknown>
+) {
+  let payload: Record<string, unknown> | undefined;
+  const result = await cache.run({
+    cacheKey,
+    knownDigest: args.known_digest,
+    cacheMaxAgeMs: args.cache_max_age_ms ?? 0,
+    execute: () => {
+      payload = payloadFactory();
+      return JSON.stringify(payload, null, 2);
+    }
+  });
+
+  const metadata = {
+    result_digest_sha256: result.resultDigestSha256,
+    result_bytes: result.resultBytes,
+    result_chars: result.resultChars,
+    returned_chars: result.returnedChars,
+    not_modified: result.notModified,
+    result_suppressed: result.resultSuppressed,
+    cache_hit: result.cacheHit,
+    execution_skipped: result.executionSkipped,
+    cache_age_ms: result.cacheAgeMs,
+    content_retained: result.contentRetained
+  };
+
+  if (result.notModified) return statusResult(metadata);
+  return statusResult({ ...(payload ?? {}), ...metadata });
 }
 
 function promptSchema(prompt: DiscoveredPrompt): z.ZodObject<any> {
@@ -45,6 +87,7 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
   const proxiedTools = new Map<string, RegisteredTool>();
   const proxiedPrompts = new Map<string, RegisteredPrompt>();
   const proxiedResources = new Map<string, RegisteredResource>();
+  const controlReadCache = createConditionalReadCache({ maxEntries: 16, maxCacheAgeMs: 300000 });
 
   const registerProxyTool = (tool: ReturnType<ProviderManager["listTools"]>[number]) => {
     const inputSchema = fromJsonSchema(tool.inputSchema as any);
@@ -147,17 +190,27 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
   };
 
   server.registerTool("vgate_status", {
-    description: "Return VGate gateway and downstream provider health.",
-    inputSchema: z.object({})
-  }, async () => statusResult({
-    gateway: { name: "VGate", version: "0.1.2" },
-    ...manager.snapshot()
-  }));
+    description: "Return VGate gateway and downstream provider health. Supports SHA-256 conditional reads and a bounded digest-only metadata cache.",
+    inputSchema: conditionalReadSchema
+  }, async (args: ConditionalReadArgs) => conditionalStatusResult(
+    controlReadCache,
+    "vgate_status:v1",
+    args,
+    () => ({
+      gateway: { name: "VGate", version: "0.1.2" },
+      ...manager.snapshot()
+    })
+  ));
 
   server.registerTool("vgate_list_providers", {
-    description: "List configured downstream MCP providers and discovered capability counts.",
-    inputSchema: z.object({})
-  }, async () => statusResult(manager.snapshot()));
+    description: "List configured downstream MCP providers and discovered capability counts. Supports SHA-256 conditional reads and a bounded digest-only metadata cache.",
+    inputSchema: conditionalReadSchema
+  }, async (args: ConditionalReadArgs) => conditionalStatusResult(
+    controlReadCache,
+    "vgate_list_providers:v1",
+    args,
+    () => manager.snapshot() as Record<string, unknown>
+  ));
 
   server.registerTool("vgate_refresh", {
     description: "Reconnect downstream MCP providers, re-discover capabilities, and reconcile the upstream surface.",
@@ -165,6 +218,7 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
   }, async () => {
     await manager.refresh();
     reconcileCapabilities();
+    controlReadCache.clear();
     return statusResult({ refreshed: true, ...manager.snapshot() });
   });
 

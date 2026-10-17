@@ -22,3 +22,28 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm audit --audit-level=high
+
+  windows-lifecycle:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate PowerShell syntax
+        shell: powershell
+        run: |
+          $errors = @()
+          Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$parseErrors)
+            if ($parseErrors) { $errors += $parseErrors }
+          }
+          if ($errors.Count -gt 0) {
+            $errors | Format-List | Out-String | Write-Error
+            exit 1
+          }
+      - name: Connection settings smoke
+        shell: powershell
+        run: .\tests\connection-settings-smoke.ps1
+      - name: Tunnel lifecycle smoke
+        shell: powershell
+        run: .\tests\tunnel-lifecycle-smoke.ps1

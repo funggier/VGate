@@ -64,10 +64,52 @@ describe("VGate upstream stdio", () => {
             promptCount: 1,
             resourceCount: 1
           }
-        }
+        },
+        not_modified: false,
+        cache_hit: false,
+        execution_skipped: false
+      });
+      const digest = String((status.structuredContent as Record<string, unknown>).result_digest_sha256 ?? "");
+      expect(digest).toMatch(/^[0-9a-f]{64}$/);
+
+      const cached = await client.callTool({
+        name: "vgate_status",
+        arguments: { known_digest: digest, cache_max_age_ms: 60000 }
+      }, { timeout: 5000 });
+      expect(cached.structuredContent).toMatchObject({
+        result_digest_sha256: digest,
+        not_modified: true,
+        result_suppressed: true,
+        cache_hit: true,
+        execution_skipped: true
+      });
+      expect(cached.structuredContent).not.toHaveProperty("providers");
+
+      const revalidated = await client.callTool({
+        name: "vgate_status",
+        arguments: { known_digest: digest, cache_max_age_ms: 0 }
+      }, { timeout: 5000 });
+      expect(revalidated.structuredContent).toMatchObject({
+        result_digest_sha256: digest,
+        not_modified: true,
+        result_suppressed: true,
+        cache_hit: false,
+        execution_skipped: false
+      });
+
+      await client.callTool({ name: "vgate_refresh", arguments: {} }, { timeout: 5000 });
+      const afterRefresh = await client.callTool({
+        name: "vgate_status",
+        arguments: { known_digest: digest, cache_max_age_ms: 60000 }
+      }, { timeout: 5000 });
+      expect(afterRefresh.structuredContent).toMatchObject({
+        result_digest_sha256: digest,
+        not_modified: true,
+        cache_hit: false,
+        execution_skipped: false
       });
     } finally {
       await client.close();
     }
-  }, 10000);
+  }, 15000);
 });

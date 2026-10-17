@@ -34,7 +34,9 @@ VGate does not contain an LLM. The upstream agent decides what to do; VGate disc
 - Hot capability refresh through `vgate_refresh`
 - Namespaced tools: `<provider>__<tool>`
 - Profiles and allow/deny tool policy
-- Local-only configuration and Windows DPAPI tunnel credential support
+- Local-only tunnel settings with separate Tunnel ID / Organization ID / health port state
+- Windows DPAPI Runtime API key storage (API-key-only for new writes)
+- Conditional SHA-256 read cache for VGate-owned status/provider inventory responses
 
 ## Quick start
 
@@ -97,13 +99,29 @@ These are configuration examples, not hard-coded VGate integrations. Any compati
 For a local ChatGPT tunnel installation:
 
 ```text
+Setup-VGate.cmd
 Start-VGate.cmd
 Stop-VGate.cmd
 Restart-VGate.cmd
 Status-VGate.cmd
+Clear-VGateSettings.cmd
 ```
 
+`Setup-VGate.cmd` stores Tunnel ID / Organization ID / health port in `local-secrets\vgate-settings.json`, stores only the Runtime API key in DPAPI-protected `local-secrets\vgate-tunnel.json.enc`, and generates `mcp-conf.yaml` automatically. Existing combined credentials remain readable for one-time migration.
+
+`Clear-VGateSettings.cmd` can clear only the API key, only connection settings, or all generated tunnel state. Clearing connection settings preserves the API key while removing any legacy Organization ID retained inside the encrypted credential.
+
 The active tunnel profile `mcp-conf.yaml`, `tunnel-client.exe`, `vgate.local.json`, encrypted credentials, runtime state, and logs are local-only and excluded from Git. `Restart-VGate.cmd` launches a detached worker so the current tunnel can disconnect and be brought back even when the restart originated from the connection being replaced. `Status-VGate.cmd` and `Stop-VGate.cmd` keep their result visible by default; automation can use `--no-hold` to return immediately while preserving the underlying PowerShell exit code.
+
+## Conditional read cache
+
+`vgate_status` and `vgate_list_providers` support optional `known_digest` and `cache_max_age_ms` inputs. Successful responses expose `result_digest_sha256` and cache metadata.
+
+- `cache_max_age_ms: 0` revalidates the current gateway snapshot and suppresses the body when unchanged.
+- A positive TTL may short-circuit a repeated safe read when matching digest metadata is still fresh.
+- The cache stores digest/size/timestamp metadata only; it does not retain result content.
+- `vgate_refresh` always executes and clears the control-read cache.
+- Proxied provider tools, prompts, and resources are never cached by this layer.
 
 ## Security
 
