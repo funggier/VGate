@@ -21,7 +21,7 @@ VGate does not contain an LLM. The upstream agent decides what to do; VGate disc
 
 ## Current baseline
 
-- Release target: v0.1.3 — Tunnel Settings & Conditional Read Cache
+- Release: [v0.1.3 — Tunnel Settings & Conditional Read Cache](https://github.com/funggier/VGate/releases/tag/v0.1.3)
 
 - Node.js 20+ / TypeScript
 - MCP TypeScript SDK v2

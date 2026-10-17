@@ -13,7 +13,7 @@
 | VG-009 | MonoGame Provider Discovery & Integration | DONE / DEPLOYED / LIVE GREEN |
 | VG-010 | v0.1.2 MonoGame Integration Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 | VG-011 | Separated Tunnel Settings & Conditional Read Cache | DONE / DEPLOYED / LIVE GREEN |
-| VG-012 | v0.1.3 Tunnel Settings & Conditional Read Cache Release | ACTIVE |
+| VG-012 | v0.1.3 Tunnel Settings & Conditional Read Cache Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 
 ## v0.1.0 closure — 2026-10-13
 
@@ -61,10 +61,10 @@ VG-007 is COMPLETE / DEPLOYED / LIVE GREEN: Godot is federated into `game-dev` a
 - v0.1.0 and v0.1.1 remain unchanged.
 - report: docs/development/reports/VGATE-20261013-v0.1.2-release.md.
 
-## v0.1.3 release candidate - 2026-10-17
+## v0.1.3 release closure - 2026-10-17
 
 - VG-011 is COMPLETE / DEPLOYED / LIVE GREEN.
-- Release target: v0.1.3.
+- Published release: v0.1.3.
 - Public gateway control surface unchanged: vgate_status / vgate_list_providers / vgate_refresh.
 - Five-provider game-dev federation remains unchanged.
-- Release requires exact release-commit CI, live 0.1.3 activation, cache requalification, immutable tag and three checksum-verified assets.
+- Exact release-commit CI, live 0.1.3 activation, cache requalification, immutable tag and three checksum-verified assets all passed.
