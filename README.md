@@ -12,16 +12,16 @@ ChatGPT / MCP Host
   namespace / policy
   health / refresh
         |
-   +----+--------+--------+--------+
-   |             |        |        |
- Roblox MCP   Blender   Unity MCP   Godot MCP   MonoGame
+   +----+--------+--------+--------+----------+
+   |             |        |        |          |
+ Roblox MCP   Blender   Unity MCP   Godot MCP   MonoGame   ClipStudio
 ```
 
 VGate does not contain an LLM. The upstream agent decides what to do; VGate discovers capabilities and routes each MCP operation to the correct provider.
 
 ## Current baseline
 
-- Release: [v0.1.3 — Tunnel Settings & Conditional Read Cache](https://github.com/funggier/VGate/releases/tag/v0.1.3)
+- Release: [v0.1.4 — CLIP STUDIO PAINT Provider](https://github.com/funggier/VGate/releases/tag/v0.1.4)
 
 - Node.js 20+ / TypeScript
 - MCP TypeScript SDK v2

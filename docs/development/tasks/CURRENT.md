@@ -1,28 +1,25 @@
 # Current Task
 
-**Task:** None
-**Status:** NO ACTIVE TASK
+**Task:** VG-014 — VGate v0.1.4 CLIP STUDIO PAINT Provider Release
+**Status:** ACTIVE
 
-## Latest development closure
+## Goal
 
-VG-013 — CLIP STUDIO PAINT Provider & Live Qualification is **COMPLETE / DEPLOYED / LIVE GREEN**.
+Publish the completed VG-013 CLIP STUDIO PAINT integration as immutable release **v0.1.4**.
 
-- implementation commit: `4dd3822cd972ec4ae5e74d295674de523175ea03`
-- VGate runtime: 0.1.3
+## Authoritative pre-release state
+
+- branch: `main`
+- local implementation/closure HEAD before release preparation: `b22ed69b3b1a9814d9a049a30ad144bc78638737`
+- previous immutable release: `v0.1.3`
+- live VGate before version bump: 0.1.3
 - live profile: `game-dev`
-- live providers: Roblox, Blender, Unity, Godot, MonoGame, CLIP STUDIO PAINT — all ready
-- CLIP STUDIO provider: 12 tools
-- real CLIP STUDIO PAINT: 4.0.10 qualified
-- provider conditional cache: PASS
-- VGate control-read cache after provider addition: PASS
-- tests: 41/41 PASS
-- build/typecheck/audit: PASS / PASS / 0 vulnerabilities
-- tunnel liveness/readiness/control plane: PASS
+- six live providers ready, including `clipstudio` with 12 tools
+- real CLIP STUDIO PAINT 4.0.10 direct VGate calls: PASS
+- VG-013 report: `docs/development/reports/VGATE-20261018-VG-013-clip-studio-provider.md`
 
-Report: `docs/development/reports/VGATE-20261018-VG-013-clip-studio-provider.md`
+## Release gates
 
-Published tags/releases v0.1.0, v0.1.1, v0.1.2 and v0.1.3 remain immutable. VG-013 is a deployed development change; no new release was created.
+See `docs/development/tasks/VG-014-v0.1.4-clip-studio-release.md`.
 
-### Client catalog note
-
-The ChatGPT session used for qualification began before `clipstudio` was added. VGate runtime discovery is green, but the existing client-side tool catalog still contains the pre-VG-013 namespace set. Refresh/reconnect VGate in ChatGPT to load `clipstudio__*` tools.
+Published tags/releases v0.1.0 through v0.1.3 are immutable.
