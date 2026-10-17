@@ -1,33 +1,28 @@
 # Current Task
 
-**Task:** VG-013 — CLIP STUDIO PAINT Provider & Live Qualification
-**Status:** ACTIVE
+**Task:** None
+**Status:** NO ACTIVE TASK
 
-## Goal
+## Latest development closure
 
-Add a VGate-owned CLIP STUDIO PAINT provider that controls the real Windows application through bounded, guarded OS automation without hard-coding Clip Studio behavior into the VGate gateway core.
+VG-013 — CLIP STUDIO PAINT Provider & Live Qualification is **COMPLETE / DEPLOYED / LIVE GREEN**.
 
-## Baseline
+- implementation commit: `4dd3822cd972ec4ae5e74d295674de523175ea03`
+- VGate runtime: 0.1.3
+- live profile: `game-dev`
+- live providers: Roblox, Blender, Unity, Godot, MonoGame, CLIP STUDIO PAINT — all ready
+- CLIP STUDIO provider: 12 tools
+- real CLIP STUDIO PAINT: 4.0.10 qualified
+- provider conditional cache: PASS
+- VGate control-read cache after provider addition: PASS
+- tests: 41/41 PASS
+- build/typecheck/audit: PASS / PASS / 0 vulnerabilities
+- tunnel liveness/readiness/control plane: PASS
 
-- VGate live baseline before work: v0.1.3 / profile `game-dev`
-- Existing providers before work: Roblox, Blender, Unity, Godot, MonoGame — all ready
-- CLIP STUDIO PAINT live executable:
-  `C:\DATAstore\CELSYS\CLIP STUDIO 1.5\CLIP STUDIO PAINT\CLIPStudioPaint.exe`
-- Verified product version: 4.0.10
-- Existing v0.1.0-v0.1.3 tags/releases are immutable.
+Report: `docs/development/reports/VGATE-20261018-VG-013-clip-studio-provider.md`
 
-## Acceptance evidence
+Published tags/releases v0.1.0, v0.1.1, v0.1.2 and v0.1.3 remain immutable. VG-013 is a deployed development change; no new release was created.
 
-- dedicated `clipstudio` stdio provider discovered by VGate;
-- existing five providers remain ready;
-- live CLIP STUDIO status/version/process/window call passes;
-- launch/focus/open primitives are guarded;
-- save/undo/redo use guarded keyboard chords;
-- mouse input is rejected outside the Clip Studio main-window rectangle;
-- screenshot is file-backed by default with inline image payload opt-in;
-- Clip Studio status supports digest/TTL conditional reads without retaining result content;
-- local typecheck/tests/build/npm audit pass;
-- live VGate refresh exposes Clip Studio without regressing existing providers;
-- real CLIP STUDIO 4.0.10 qualification evidence is recorded.
+### Client catalog note
 
-Task file: `docs/development/tasks/VG-013-clip-studio-provider.md`
+The ChatGPT session used for qualification began before `clipstudio` was added. VGate runtime discovery is green, but the existing client-side tool catalog still contains the pre-VG-013 namespace set. Refresh/reconnect VGate in ChatGPT to load `clipstudio__*` tools.

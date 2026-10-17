@@ -1,6 +1,6 @@
 # VG-013 — CLIP STUDIO PAINT Provider & Live Qualification
 
-Status: **ACTIVE**
+Status: **COMPLETE / DEPLOYED / LIVE GREEN**
 
 ## Objective
 
@@ -61,3 +61,25 @@ Expected product:
 ## Completion criteria
 
 VG-013 closes only after source tests, production build, live VGate refresh, conditional cache checks and at least one real Clip Studio status + capture/open/control qualification pass are observed.
+
+## Closure — 2026-10-18
+
+Implementation commit: `4dd3822cd972ec4ae5e74d295674de523175ea03`
+
+Qualification:
+
+- TypeScript typecheck: PASS
+- full Vitest suite: 41/41 PASS across 14 test files
+- production build: PASS
+- production dependency audit: 0 vulnerabilities
+- real CLIP STUDIO PAINT 4.0.10 status/open/capture/input qualification: PASS
+- provider digest/TTL conditional read cache: PASS
+- guarded invalid-key and out-of-window mouse rejection: PASS
+- live VGate production restart: PASS
+- six-provider `game-dev` inventory: all ready; `clipstudio` exposes 12 tools
+- VGate gateway conditional-read cache after provider addition: positive TTL and TTL=0 revalidation PASS
+- tunnel liveness/readiness/control-plane health: PASS
+
+The current ChatGPT session was opened before the new provider existed, so its client-side tool catalog does not dynamically contain `clipstudio__*`. Refreshing/reconnecting VGate in ChatGPT is required to load the new names; the VGate runtime itself has already discovered the provider and reports it ready.
+
+No existing tag or release was modified, and no new release was created.
