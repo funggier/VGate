@@ -8,7 +8,8 @@
         "blender",
         "unity",
         "godot",
-        "monogame"
+        "monogame",
+        "clipstudio"
       ]
     }
   },
@@ -86,6 +87,22 @@
         "MONOGAME_MCP_ALLOWED_ROOT": "${env:MONOGAME_MCP_ALLOWED_ROOT}"
       },
       "timeoutMs": 120000,
+      "toolPolicy": {
+        "default": "allow"
+      }
+    },
+    "clipstudio": {
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "dist/providers/clipstudio/server.js"
+      ],
+      "env": {
+        "CLIPSTUDIO_MCP_EXE": "${env:CLIPSTUDIO_MCP_EXE}",
+        "CLIPSTUDIO_MCP_HELPER": "scripts/clipstudio-win.ps1",
+        "CLIPSTUDIO_MCP_CAPTURE_DIR": "runtime/clipstudio-captures"
+      },
+      "timeoutMs": 30000,
       "toolPolicy": {
         "default": "allow"
       }

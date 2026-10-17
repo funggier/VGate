@@ -14,6 +14,7 @@
 | VG-010 | v0.1.2 MonoGame Integration Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 | VG-011 | Separated Tunnel Settings & Conditional Read Cache | DONE / DEPLOYED / LIVE GREEN |
 | VG-012 | v0.1.3 Tunnel Settings & Conditional Read Cache Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
+| VG-013 | CLIP STUDIO PAINT Provider & Live Qualification | ACTIVE |
 
 ## v0.1.0 closure — 2026-10-13
 

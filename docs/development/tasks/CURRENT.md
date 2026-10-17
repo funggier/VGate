@@ -1,21 +1,33 @@
 # Current Task
 
-**Task:** None
-**Status:** NO ACTIVE TASK
+**Task:** VG-013 — CLIP STUDIO PAINT Provider & Live Qualification
+**Status:** ACTIVE
 
-## Latest release closure
+## Goal
 
-VG-012 — VGate v0.1.3 Tunnel Settings & Conditional Read Cache Release is **COMPLETE / PUBLISHED / DEPLOYED / LIVE GREEN**.
+Add a VGate-owned CLIP STUDIO PAINT provider that controls the real Windows application through bounded, guarded OS automation without hard-coding Clip Studio behavior into the VGate gateway core.
 
-- release commit: `2e3c825648c1db2b40eab667e270f64c78ff5433`
-- exact-commit CI: #22 / run `39033755188` / SUCCESS
-- tag/release: `v0.1.3`
-- live runtime: 0.1.3
-- live profile: `game-dev`
-- all five providers: ready
-- conditional cache positive-TTL + TTL=0: PASS
-- release download-back SHA-256 verification: PASS / 0 mismatches
+## Baseline
 
-Report: `docs/development/reports/VGATE-20261017-VG-012-v0.1.3-release.md`
+- VGate live baseline before work: v0.1.3 / profile `game-dev`
+- Existing providers before work: Roblox, Blender, Unity, Godot, MonoGame — all ready
+- CLIP STUDIO PAINT live executable:
+  `C:\DATAstore\CELSYS\CLIP STUDIO 1.5\CLIP STUDIO PAINT\CLIPStudioPaint.exe`
+- Verified product version: 4.0.10
+- Existing v0.1.0-v0.1.3 tags/releases are immutable.
 
-Published tags/releases v0.1.0, v0.1.1, v0.1.2 and v0.1.3 are immutable.
+## Acceptance evidence
+
+- dedicated `clipstudio` stdio provider discovered by VGate;
+- existing five providers remain ready;
+- live CLIP STUDIO status/version/process/window call passes;
+- launch/focus/open primitives are guarded;
+- save/undo/redo use guarded keyboard chords;
+- mouse input is rejected outside the Clip Studio main-window rectangle;
+- screenshot is file-backed by default with inline image payload opt-in;
+- Clip Studio status supports digest/TTL conditional reads without retaining result content;
+- local typecheck/tests/build/npm audit pass;
+- live VGate refresh exposes Clip Studio without regressing existing providers;
+- real CLIP STUDIO 4.0.10 qualification evidence is recorded.
+
+Task file: `docs/development/tasks/VG-013-clip-studio-provider.md`

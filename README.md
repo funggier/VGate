@@ -37,6 +37,7 @@ VGate does not contain an LLM. The upstream agent decides what to do; VGate disc
 - Local-only tunnel settings with separate Tunnel ID / Organization ID / health port state
 - Windows DPAPI Runtime API key storage (API-key-only for new writes)
 - Conditional SHA-256 read cache for VGate-owned status/provider inventory responses
+- VGate-owned CLIP STUDIO PAINT provider with guarded Windows input and bounded window capture
 
 ## Quick start
 
@@ -82,7 +83,7 @@ Environment references use `${env:NAME}`. Provider IDs become namespaces; for ex
 
 ## Game-development providers
 
-The example profile includes five independent MCP providers:
+The example profile includes six independent MCP providers:
 
 - **Roblox Studio** — official `StudioMCP.exe`; the included launcher resolves the newest installed Roblox Studio version at runtime so updates do not hard-code a version directory
 - **Blender** — Blender Lab MCP server paired with the Blender MCP add-on; the example uses Blender MCP v1.0.3 and the add-on bridge on localhost:9876
@@ -91,6 +92,8 @@ The example profile includes five independent MCP providers:
 - **Godot** — pinned `@npgamedev/godot-mcp-server@1.0.3` stdio bridge. Live editor operations require the Godot MCP Toolkit plugin enabled in the target Godot 4.2+ project. Set `GODOT_MCP_CONFIG_VERSION=1`; when VGate runs outside the target project directory, set `GODOT_MCP_PROJECT_PATH` in local provider env to that project's absolute path so registry discovery selects the correct editor instance. On Windows, production config wraps `npx` with `cmd.exe /d /c`.
 
 - **MonoGame** — VGate-owned bounded stdio provider for MonoGame 3.8.6 project inspection, project/content build, controlled project creation and bounded run operations. Install `MonoGame.Templates.CSharp@3.8.6`, use .NET 10 (qualification baseline: 10.0.401), and set `MONOGAME_MCP_ALLOWED_ROOT` only in local environment/config to the parent directory containing allowed MonoGame projects. The provider supports the MonoGame 3.8.6 Content Builder workflow and detects legacy MGCB projects when present. VS Code can use the same CLI contracts; C# Dev Kit/C# are recommended and `r88.monogame` is optional.
+
+- **CLIP STUDIO PAINT** — VGate-owned Windows stdio provider for CLIP STUDIO PAINT 4.x. Configure `CLIPSTUDIO_MCP_EXE` to the machine-local executable. The provider exposes status/launch/focus/open/save/undo/redo plus guarded allowlisted keyboard and in-window mouse primitives. Window capture is file-backed by default and inline image payloads are opt-in. `application_status` supports SHA-256 conditional reads with digest-only TTL metadata caching; provider mutation tools are never cached.
 
 These are configuration examples, not hard-coded VGate integrations. Any compatible MCP server can be added without changing VGate core.
 
@@ -122,6 +125,7 @@ The active tunnel profile `mcp-conf.yaml`, `tunnel-client.exe`, `vgate.local.jso
 - The cache stores digest/size/timestamp metadata only; it does not retain result content.
 - `vgate_refresh` always executes and clears the control-read cache.
 - Proxied provider tools, prompts, and resources are never cached by this layer.
+- Providers may implement their own bounded read cache when explicitly documented; the CLIP STUDIO PAINT `application_status` tool uses the same digest-only contract.
 
 ## Security
 
