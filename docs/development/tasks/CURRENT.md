@@ -1,25 +1,25 @@
 # Current Task
 
-**Task:** VG-014 — VGate v0.1.4 CLIP STUDIO PAINT Provider Release
-**Status:** ACTIVE
+**Task:** None
+**Status:** NO ACTIVE TASK
 
-## Goal
+## Latest release closure
 
-Publish the completed VG-013 CLIP STUDIO PAINT integration as immutable release **v0.1.4**.
+VG-014 — VGate v0.1.4 CLIP STUDIO PAINT Provider Release is **COMPLETE / PUBLISHED / DEPLOYED / LIVE GREEN**.
 
-## Authoritative pre-release state
-
-- branch: `main`
-- local implementation/closure HEAD before release preparation: `b22ed69b3b1a9814d9a049a30ad144bc78638737`
-- previous immutable release: `v0.1.3`
-- live VGate before version bump: 0.1.3
+- release commit: `ad636549e06e71ecc093aaee2775dc241a51ed48`
+- exact-commit CI: #24 / run `39053548513` / SUCCESS
+- tag/release: `v0.1.4`
+- live runtime: 0.1.4
 - live profile: `game-dev`
-- six live providers ready, including `clipstudio` with 12 tools
-- real CLIP STUDIO PAINT 4.0.10 direct VGate calls: PASS
-- VG-013 report: `docs/development/reports/VGATE-20261018-VG-013-clip-studio-provider.md`
+- all six providers: ready
+- CLIP STUDIO PAINT provider: 12 tools
+- real CLIP STUDIO PAINT 4.0.10 direct status/capture: PASS
+- gateway + Clip Studio conditional cache: PASS
+- clean tagged-source qualification: 41/41 tests PASS
+- clean release-ZIP install: PASS
+- release assets download-back SHA-256 verification: PASS / 0 mismatches
 
-## Release gates
+Report: `docs/development/reports/VGATE-20261018-VG-014-v0.1.4-release.md`
 
-See `docs/development/tasks/VG-014-v0.1.4-clip-studio-release.md`.
-
-Published tags/releases v0.1.0 through v0.1.3 are immutable.
+Published tags/releases v0.1.0 through v0.1.4 are immutable.

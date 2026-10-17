@@ -219,3 +219,7 @@ This is not a VGate runtime failure. Refresh/reconnect VGate in ChatGPT (or star
 VG-013 acceptance criteria are satisfied.
 
 The real local CLIP STUDIO PAINT 4.0.10 instance is now integrated into the deployed VGate runtime through a bounded, guarded MCP provider, and the existing cache design remains intact.
+
+## Subsequent release
+
+VG-013 was subsequently published as **VGate v0.1.4 — CLIP STUDIO PAINT Provider** under VG-014. The v0.1.4 release is pinned to commit `ad636549e06e71ecc093aaee2775dc241a51ed48`; see `docs/development/reports/VGATE-20261018-VG-014-v0.1.4-release.md`.
