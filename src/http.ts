@@ -4,6 +4,7 @@ import { createMcpHandler } from "@modelcontextprotocol/server";
 import { localhostHostValidation, localhostOriginValidation, toNodeHandler } from "@modelcontextprotocol/node";
 import { createGatewayServer } from "./gateway.js";
 import type { ProviderManager } from "./providers/manager.js";
+import type { ProviderConnectionController } from "./provider-connections.js";
 
 export interface GatewayHttpOptions {
   host: string;
@@ -19,9 +20,10 @@ export interface GatewayHttpHandle {
 
 export async function startGatewayHttp(
   manager: ProviderManager,
-  options: GatewayHttpOptions
+  options: GatewayHttpOptions,
+  connections?: ProviderConnectionController
 ): Promise<GatewayHttpHandle> {
-  const handler = createMcpHandler(() => createGatewayServer(manager).server);
+  const handler = createMcpHandler(() => createGatewayServer(manager, connections).server);
   const nodeHandler = toNodeHandler(handler);
   const validateHost = localhostHostValidation();
   const validateOrigin = localhostOriginValidation();

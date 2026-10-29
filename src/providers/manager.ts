@@ -70,16 +70,55 @@ export class ProviderManager {
   private readonly promptRoutes = new Map<string, DiscoveredPrompt>();
   private readonly resourceRoutes = new Map<string, DiscoveredResource>();
 
-  constructor(private readonly config: GatewayConfig) {
-    for (const [id, provider] of selectProviders(config)) {
+  constructor(private config: GatewayConfig) {
+    this.initializeRuntimes();
+  }
+
+  private readonly unconfigured = new Set<string>();
+
+  private initializeRuntimes(): void {
+    const active = this.config.activeProfile
+      ? new Set(this.config.profiles[this.config.activeProfile]?.providers ?? [])
+      : null;
+    for (const [id, provider] of Object.entries(this.config.providers)) {
+      if (active && !active.has(id)) continue;
+      let resolved = provider;
+      let configured = provider.enabled;
+      let lastError: string | undefined;
+      if (configured) {
+        try {
+          const selected = selectProviders({
+            ...this.config, activeProfile: undefined, profiles: {}, providers: { [id]: provider }
+          });
+          resolved = selected[0]?.[1] ?? provider;
+        } catch (error) {
+          configured = false;
+          lastError = "Missing provider configuration: " + errorMessage(error);
+        }
+      }
       this.runtimes.set(id, {
-        id, config: provider, state: "disabled", tools: [], prompts: [], resources: [], resourceTemplateCount: 0
+        id, config: resolved, state: "disabled", tools: [], prompts: [],
+        resources: [], resourceTemplateCount: 0,
+        lastError: configured ? undefined : lastError ?? "Provider disabled in local settings."
       });
+      if (!configured) this.unconfigured.add(id);
     }
   }
 
   async connectAll(): Promise<void> {
-    for (const runtime of this.runtimes.values()) await this.connectOne(runtime);
+    for (const runtime of this.runtimes.values()) {
+      if (this.unconfigured.has(runtime.id)) continue;
+      await this.connectOne(runtime);
+    }
+  }
+
+  async reloadConfig(next: GatewayConfig): Promise<void> {
+    await this.close();
+    this.runtimes.clear();
+    this.unconfigured.clear();
+    this.config = next;
+    this.initializeRuntimes();
+    await this.connectAll();
   }
 
   private async connectOne(runtime: ProviderRuntime): Promise<void> {

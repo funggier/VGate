@@ -16,6 +16,7 @@
 | VG-012 | v0.1.3 Tunnel Settings & Conditional Read Cache Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 | VG-013 | CLIP STUDIO PAINT Provider & Live Qualification | DONE / DEPLOYED / LIVE GREEN |
 | VG-014 | v0.1.4 CLIP STUDIO PAINT Provider Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
+| VG-015 | Portable per-machine Provider Connection Registry | ACTIVE |
 
 ## v0.1.0 closure — 2026-10-13
 

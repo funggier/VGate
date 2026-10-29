@@ -26,7 +26,18 @@ describe("VGate upstream stdio", () => {
       expect(names).toContain("vgate_status");
       expect(names).toContain("vgate_list_providers");
       expect(names).toContain("vgate_refresh");
+      expect(names).toContain("vgate_provider_connections");
+      expect(names).toContain("vgate_provider_discover");
+      expect(names).toContain("vgate_provider_configure");
+      expect(names).toContain("vgate_provider_forget");
       expect(names).toContain("fixture__echo");
+
+      const connections = await client.callTool({ name: "vgate_provider_connections", arguments: {} }, { timeout: 5000 });
+      expect(connections.structuredContent).toHaveProperty("catalog.clipstudio.fields");
+      const unknown = await client.callTool({
+        name: "vgate_provider_configure", arguments: { provider: "clipstudio", executablePath: "/missing/CLIPStudioPaint.exe" }
+      }, { timeout: 5000 });
+      expect(unknown.isError).toBe(true);
 
       const echoed = await client.callTool(
         { name: "fixture__echo", arguments: { text: "gateway" } },

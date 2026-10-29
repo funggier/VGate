@@ -8,6 +8,7 @@ import {
 import * as z from "zod/v4";
 import { createConditionalReadCache } from "./conditional-read-cache.js";
 import type { DiscoveredPrompt, DiscoveredResource, ProviderManager } from "./providers/manager.js";
+import type { ProviderConnectionController } from "./provider-connections.js";
 
 export interface GatewayServerBundle {
   server: McpServer;
@@ -82,12 +83,14 @@ function resourceMetadata(resource: DiscoveredResource): Record<string, unknown>
   };
 }
 
-export function createGatewayServer(manager: ProviderManager): GatewayServerBundle {
+export function createGatewayServer(manager: ProviderManager, connections?: ProviderConnectionController): GatewayServerBundle {
   const server = new McpServer({ name: "VGate", version: "0.1.4" });
   const proxiedTools = new Map<string, RegisteredTool>();
   const proxiedPrompts = new Map<string, RegisteredPrompt>();
   const proxiedResources = new Map<string, RegisteredResource>();
   const controlReadCache = createConditionalReadCache({ maxEntries: 16, maxCacheAgeMs: 300000 });
+  let registrationFrozen = false;
+  const clientReconnectRequired = () => manager.listTools().some((tool) => !proxiedTools.has(tool.upstreamName));
 
   const registerProxyTool = (tool: ReturnType<ProviderManager["listTools"]>[number]) => {
     const inputSchema = fromJsonSchema(tool.inputSchema as any);
@@ -141,7 +144,9 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
     for (const [name, tool] of tools) {
       const old = proxiedTools.get(name);
       if (!old) {
-        registerProxyTool(tool);
+        // MCP SDK v2 forbids registering new tool capabilities on a connected transport.
+        // Stable vgate_provider_invoke can route to newly configured providers immediately.
+        if (!registrationFrozen) registerProxyTool(tool);
         continue;
       }
       const inputSchema = fromJsonSchema(tool.inputSchema as any);
@@ -171,7 +176,7 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
       const old = proxiedPrompts.get(name);
       if (old) old.remove();
       proxiedPrompts.delete(name);
-      registerProxyPrompt(prompt);
+      if (!registrationFrozen) registerProxyPrompt(prompt);
     }
 
     const resources = new Map(manager.listResources().map((resource) => [resource.upstreamUri, resource]));
@@ -185,7 +190,7 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
       const old = proxiedResources.get(uri);
       if (old) old.remove();
       proxiedResources.delete(uri);
-      registerProxyResource(resource);
+      if (!registrationFrozen) registerProxyResource(resource);
     }
   };
 
@@ -212,16 +217,94 @@ export function createGatewayServer(manager: ProviderManager): GatewayServerBund
     () => manager.snapshot() as Record<string, unknown>
   ));
 
+  server.registerTool("vgate_provider_invoke", {
+    description: "Call a currently discovered, policy-allowed downstream tool even when a newly configured provider has not yet appeared in this ChatGPT session's tool catalog. Uses the same provider routes and policies as direct proxy tools.",
+    inputSchema: z.object({
+      toolName: z.string().regex(/^[a-z][a-z0-9_-]*__[A-Za-z0-9_-]+$/),
+      args: z.record(z.string(), z.unknown()).default({})
+    })
+  }, async ({ toolName, args }) => {
+    try {
+      return await manager.callTool(toolName, args);
+    } catch (error) {
+      return {
+        isError: true,
+        content: [{ type: "text" as const, text: error instanceof Error ? error.message : String(error) }]
+      };
+    }
+  });
+
+  if (connections) {
+    const connectionError = (error: unknown) => ({
+      isError: true,
+      content: [{
+        type: "text" as const,
+        text: error instanceof Error ? error.message : String(error)
+      }]
+    });
+
+    server.registerTool("vgate_provider_connections", {
+      description: "List supported program connection settings, saved per-machine values, and current provider states. Settings are stored locally and are not part of the source repo or release.",
+      inputSchema: z.object({})
+    }, async () => {
+      try { return statusResult(await connections.list()); }
+      catch (error) { return connectionError(error); }
+    });
+
+    server.registerTool("vgate_provider_discover", {
+      description: "Inspect safe known local-program discovery hints. For CLIP STUDIO PAINT, detect a running or registered installation without launching arbitrary executables.",
+      inputSchema: z.object({ provider: z.enum(["roblox", "blender", "unity", "godot", "monogame", "clipstudio"]) })
+    }, async ({ provider }) => {
+      try { return statusResult(await connections.discover(provider)); }
+      catch (error) { return connectionError(error); }
+    });
+
+    server.registerTool("vgate_provider_configure", {
+      description: "Persist and activate allowlisted per-machine program connection settings. Supports Clip Studio executablePath or autoDetect, Godot projectPath, MonoGame allowedRoot, Blender loopback host/port. Unity and Roblox use their existing connector discovery; this tool enables them. Cannot alter MCP executable command, arguments, or arbitrary environment variables.",
+      inputSchema: z.object({
+        provider: z.enum(["roblox", "blender", "unity", "godot", "monogame", "clipstudio"]),
+        autoDetect: z.boolean().optional(),
+        executablePath: z.string().optional(),
+        allowedRoot: z.string().optional(),
+        projectPath: z.string().optional(),
+        host: z.string().optional(),
+        port: z.number().int().optional()
+      })
+    }, async ({ provider, autoDetect, ...values }) => {
+      try {
+        const input = Object.fromEntries(Object.entries(values).filter(([, v]) => v !== undefined));
+        const result = await connections.configure(provider, input, autoDetect ?? false);
+        reconcileCapabilities();
+        controlReadCache.clear();
+        return statusResult({ ...result, clientReconnectRequired: clientReconnectRequired() });
+      } catch (error) { return connectionError(error); }
+    });
+
+    server.registerTool("vgate_provider_forget", {
+      description: "Forget a provider's saved machine-specific settings and disable that provider, including any stale path in the older local config. Can be reconnected later using vgate_provider_configure.",
+      inputSchema: z.object({ provider: z.enum(["roblox", "blender", "unity", "godot", "monogame", "clipstudio"]) })
+    }, async ({ provider }) => {
+      try {
+        const result = await connections.forget(provider);
+        reconcileCapabilities();
+        controlReadCache.clear();
+        return statusResult({ ...result, clientReconnectRequired: clientReconnectRequired() });
+      } catch (error) { return connectionError(error); }
+    });
+  }
+
   server.registerTool("vgate_refresh", {
     description: "Reconnect downstream MCP providers, re-discover capabilities, and reconcile the upstream surface.",
     inputSchema: z.object({})
   }, async () => {
-    await manager.refresh();
+    if (connections) await connections.reload();
+    else await manager.refresh();
     reconcileCapabilities();
     controlReadCache.clear();
-    return statusResult({ refreshed: true, ...manager.snapshot() });
+    return statusResult({ refreshed: true, clientReconnectRequired: clientReconnectRequired(), ...manager.snapshot() });
   });
 
   reconcileCapabilities();
+  registrationFrozen = true;
   return { server, reconcileCapabilities };
 }

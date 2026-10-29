@@ -112,6 +112,5 @@ export function selectProviders(config: GatewayConfig, env: NodeJS.ProcessEnv = 
 export async function loadGatewayConfig(path: string, env: NodeJS.ProcessEnv = process.env): Promise<GatewayConfig> {
   const raw = await readFile(path, "utf8");
   const parsed = parseGatewayConfig(JSON.parse(raw.replace(/^\uFEFF/, "")));
-  for (const [, provider] of selectProviders(parsed, env)) void provider;
   return parsed;
 }

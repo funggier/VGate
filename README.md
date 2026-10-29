@@ -97,6 +97,47 @@ The example profile includes six independent MCP providers:
 
 These are configuration examples, not hard-coded VGate integrations. Any compatible MCP server can be added without changing VGate core.
 
+## Per-machine application connections
+
+VGate provider **templates** are portable; the program path, project root or bridge port on
+each machine is not. Since VG-015, machine-specific settings can be saved and forgotten
+through the MCP gateway instead of being hard-coded into Git-tracked source.
+
+- `vgate_provider_connections` — show supported providers, typed fields, saved local values and live status
+- `vgate_provider_discover` — show discovery hints; automatically locate running/registered CLIP STUDIO PAINT on Windows
+- `vgate_provider_configure` — validate, save locally and apply provider settings, then reconnect
+- `vgate_provider_forget` — forget saved access details and disable the provider, including old local-config fallback
+- `vgate_provider_invoke` — invoke a newly enabled, policy-allowed provider tool before reconnecting the ChatGPT plugin
+- `vgate_refresh` — reload saved machine settings from disk and refresh provider discovery
+
+Examples of user requests after connecting VGate:
+
+> Find CLIP STUDIO PAINT on this Windows computer and save it as the `clipstudio` provider.
+
+> Use the Godot project at `N:\\WorkSpace\\GodotGameProject` and remember this connection.
+
+> Use Blender's local MCP bridge on port 9876.
+
+> Forget the old MonoGame workspace connection.
+
+Settings are stored by default at `local-secrets/provider-connections.json`
+(or at `VGATE_PROVIDER_SETTINGS` if explicitly set locally), excluded from Git and
+never placed in release archives. Machine-specific settings survive VGate restarts. Newly available individual tool names may
+require reconnecting the ChatGPT plugin; `vgate_provider_invoke` provides an immediate
+policy-checked route in the current session.
+The host must still have the program, MCP bridge and other dependencies installed.
+
+When using `config/vgate.example.json` on another machine, an unset environment reference
+leaves that provider disabled with a configuration reason, rather than preventing
+the entire gateway from starting. Connect it using the management tools.
+
+**Security:** these MCP tools cannot change the trusted MCP server command, arguments,
+arbitrary environment variables or remote URLs. Only known typed paths and loopback
+bridge parameters are accepted. This registry is not a credential vault.
+
+See [VG-015 provider registry architecture](docs/architecture/VG-015-PROVIDER-CONNECTION-REGISTRY.md)
+for supported provider fields, limitations, migration, and removal behavior.
+
 ## Windows tunnel lifecycle
 
 For a local ChatGPT tunnel installation:
