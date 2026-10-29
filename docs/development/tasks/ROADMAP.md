@@ -16,7 +16,8 @@
 | VG-012 | v0.1.3 Tunnel Settings & Conditional Read Cache Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 | VG-013 | CLIP STUDIO PAINT Provider & Live Qualification | DONE / DEPLOYED / LIVE GREEN |
 | VG-014 | v0.1.4 CLIP STUDIO PAINT Provider Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
-| VG-015 | Portable per-machine Provider Connection Registry | ACTIVE |
+| VG-015 | Portable per-machine Provider Connection Registry | DONE / DEPLOYED / LIVE GREEN |
+| VG-016 | v0.1.5 Portable Connections Release + CGate Sync | ACTIVE |
 
 ## v0.1.0 closure — 2026-10-13
 
@@ -85,3 +86,14 @@ VG-007 is COMPLETE / DEPLOYED / LIVE GREEN: Godot is federated into `game-dev` a
 - Clean tagged-source and clean release-ZIP install qualification: PASS.
 - Three release assets published and download-back SHA-256 verification passed with 0 mismatches.
 - Report: docs/development/reports/VGATE-20261018-VG-014-v0.1.4-release.md.
+
+## VG-015 closure — 2026-10-29
+
+- Typed machine-local provider settings registry, safe discover/configure/forget/invoke tools: deployed.
+- Exact implementation commit: e7b171c487e99462cf1da6491b47cd2b00abfbe6.
+- CI #26 / run 40864394445: SUCCESS.
+- Full 48/48 tests, build, typecheck, smoke and dependency audit: PASS.
+- CLIP STUDIO PAINT 4.0.10 real discovery/status/capture: PASS.
+- Six-provider profile and tunnel control-plane: LIVE GREEN.
+- No new release/tag created; v0.1.4 remains immutable.
+- Report: docs/development/reports/VGATE-20261029-VG-015-provider-registry.md.

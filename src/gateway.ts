@@ -84,7 +84,7 @@ function resourceMetadata(resource: DiscoveredResource): Record<string, unknown>
 }
 
 export function createGatewayServer(manager: ProviderManager, connections?: ProviderConnectionController): GatewayServerBundle {
-  const server = new McpServer({ name: "VGate", version: "0.1.4" });
+  const server = new McpServer({ name: "VGate", version: "0.1.5" });
   const proxiedTools = new Map<string, RegisteredTool>();
   const proxiedPrompts = new Map<string, RegisteredPrompt>();
   const proxiedResources = new Map<string, RegisteredResource>();
@@ -202,7 +202,7 @@ export function createGatewayServer(manager: ProviderManager, connections?: Prov
     "vgate_status:v1",
     args,
     () => ({
-      gateway: { name: "VGate", version: "0.1.4" },
+      gateway: { name: "VGate", version: "0.1.5" },
       ...manager.snapshot()
     })
   ));

@@ -21,7 +21,7 @@ VGate does not contain an LLM. The upstream agent decides what to do; VGate disc
 
 ## Current baseline
 
-- Release: [v0.1.4 — CLIP STUDIO PAINT Provider](https://github.com/funggier/VGate/releases/tag/v0.1.4)
+- Release: [v0.1.5 — Portable Provider Connections](https://github.com/funggier/VGate/releases/tag/v0.1.5)
 
 - Node.js 20+ / TypeScript
 - MCP TypeScript SDK v2
@@ -104,7 +104,7 @@ each machine is not. Since VG-015, machine-specific settings can be saved and fo
 through the MCP gateway instead of being hard-coded into Git-tracked source.
 
 - `vgate_provider_connections` — show supported providers, typed fields, saved local values and live status
-- `vgate_provider_discover` — show discovery hints; automatically locate running/registered CLIP STUDIO PAINT on Windows
+- `vgate_provider_discover` — inspect all six programs using running process, recognized installer paths / Windows registry, and project hints (no disk-wide scan)
 - `vgate_provider_configure` — validate, save locally and apply provider settings, then reconnect
 - `vgate_provider_forget` — forget saved access details and disable the provider, including old local-config fallback
 - `vgate_provider_invoke` — invoke a newly enabled, policy-allowed provider tool before reconnecting the ChatGPT plugin
@@ -117,6 +117,14 @@ Examples of user requests after connecting VGate:
 > Use the Godot project at `N:\\WorkSpace\\GodotGameProject` and remember this connection.
 
 > Use Blender's local MCP bridge on port 9876.
+
+> Find the installed Unity editor and enable the Unity MCP provider without hardcoding a Unity installation directory.
+
+> Find the Roblox Studio installation and enable its launcher provider.
+
+> Detect a running Godot editor's project folder; if there are multiple projects, ask me which one to use.
+
+> Remember the MonoGame workspace under my selected development directory.
 
 > Forget the old MonoGame workspace connection.
 

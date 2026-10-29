@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { stat } from "node:fs/promises";
 import { mergeManagedProviderConfig, MachineProviderRegistry, providerSettingCatalog } from "./provider-settings.js";
+import { inspectProgram, type ProgramInspection, type SupportedProgram } from "./program-discovery.js";
 import type { GatewayConfig } from "./config.js";
 import type { ProviderManager } from "./providers/manager.js";
 
@@ -12,7 +13,8 @@ export interface ProviderDiscoveryResult {
   description: string;
   fields: string[];
   discovery: string;
-  candidates: Array<Record<string, string>>;
+  candidates: Array<Record<string, string | number>>;
+  inspection: ProgramInspection;
   configured: boolean;
 }
 
@@ -73,14 +75,28 @@ export class ProviderConnectionController {
       throw new Error("Unknown or unsupported configured provider: " + provider);
     }
     const template = providerSettingCatalog[provider as keyof typeof providerSettingCatalog];
-    const candidates = provider === "clipstudio" ? await findInstalledClipStudio() : [];
     const saved = await this.registry.list();
+    const prior = saved[provider as keyof typeof saved]?.values;
+    const baseProvider = this.base.providers[provider];
+    const bridgePort = baseProvider?.transport === "stdio" ? Number(baseProvider.env.BLENDER_MCP_PORT ?? 9876) : 9876;
+    const knownProjectRoot = provider === "monogame"
+      ? String(prior?.allowedRoot ?? (baseProvider?.transport === "stdio" ? baseProvider.env.MONOGAME_MCP_ALLOWED_ROOT ?? "" : ""))
+      : provider === "godot"
+        ? String(prior?.projectPath ?? (baseProvider?.transport === "stdio" ? baseProvider.env.GODOT_MCP_PROJECT_PATH ?? "" : ""))
+        : "";
+    const hints = {bridgePort, knownProjectRoot: knownProjectRoot.includes("${env:") ? "" : knownProjectRoot};
+    const inspection = await inspectProgram(provider as SupportedProgram, hints);
+    const candidates = inspection.connectionCandidates;
+    if (provider === "clipstudio" && candidates.length === 0) {
+      candidates.push(...await findInstalledClipStudio());
+    }
     return {
       provider,
       description: template.description,
       fields: template.fields,
       discovery: template.discovery,
       candidates,
+      inspection,
       configured: saved[provider as keyof typeof saved]?.enabled ?? false
     };
   }
@@ -96,11 +112,13 @@ export class ProviderConnectionController {
       if (!this.base.providers[provider]) throw new Error("Provider is not declared in the local VGate configuration.");
       let input = values;
       if (autoDetect) {
-        if (provider !== "clipstudio" || Object.keys(values).length > 0) {
-          throw new Error("Auto-detect currently supports CLIP STUDIO PAINT with no manual fields.");
+        if (Object.keys(values).length > 0) {
+          throw new Error("Use autoDetect or manual fields, not both.");
         }
         const discovery = await this.discover(provider);
-        if (discovery.candidates.length === 0) throw new Error("No running or registered CLIP STUDIO PAINT executable was detected.");
+        if (discovery.candidates.length !== 1) {
+          throw new Error("Auto-detect for " + provider + " requires exactly one unambiguous candidate; found " + discovery.candidates.length + ". Supply explicit settings or start the intended editor.");
+        }
         input = discovery.candidates[0];
       }
       const record = await this.registry.save(provider, input);

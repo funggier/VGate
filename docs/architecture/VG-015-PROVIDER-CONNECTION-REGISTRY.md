@@ -32,12 +32,12 @@ or HTTP provider URLs. Managed settings are constrained by an explicit program c
 
 | Provider | Connection fields | Discovery / bridge strategy |
 | --- | --- | --- |
-| `clipstudio` | `executablePath` | Auto-detect a running CLIPStudioPaint.exe or Windows App Paths registration; otherwise provide an absolute existing path |
+| `clipstudio` | `executablePath` | Detect a running CLIPStudioPaint.exe or Windows App Paths/uninstall registration; otherwise provide an absolute existing path |
 | `monogame` | `allowedRoot` | Choose an existing project parent directory |
 | `godot` | `projectPath` | Choose an existing project directory; the Godot editor MCP toolkit must still be installed and active |
-| `blender` | `host`, `port` | Set the Blender addon MCP bridge loopback port; non-loopback hosts are disallowed |
-| `unity` | none | Existing Unity MCP connector discovers its editor bridge; enable/forget control is supported |
-| `roblox` | none | Existing Roblox Studio launcher detects current Studio installation; enable/forget control is supported |
+| `blender` | `host`, `port` | Detect a running/registered Blender executable; use the known addon MCP loopback port (no port scan), or provide it manually |
+| `unity` | none | Detect running/registered Unity editor; existing Unity MCP connector must still discover its editor bridge |
+| `roblox` | none | Detect running/registered Roblox Studio; the existing launcher still resolves the installed Studio version |
 
 The catalog is intentionally typed. Additional applications and bridge-specific settings require
 a reviewed adapter to be added to the catalog, rather than accepting an arbitrary command from
@@ -99,9 +99,8 @@ Those prerequisites must be installed separately on the target machine.
 
 ## Limitations
 
-- Automatic executable discovery in this version is implemented for **running or App Paths-registered
-  CLIP STUDIO PAINT** on Windows only. Other listed providers use their own native connector discovery
-  or require the user to provide the specific project folder/bridge port.
+- Windows local discovery probes known process names, App Paths, PATH and Uninstall registrations for all six supported programs. A detected program does **not** prove its MCP bridge or project plugin is active. No full-disk search is attempted. Portable builds and unusual installations may require manual configuration.
+- MonoGame requires a validated workspace root; Godot needs an unambiguous project directory with project.godot. Blender requires an enabled addon and a known loopback port. Unity and Roblox use their own MCP bridge/launcher.
 - Saving a provider setting reconnects the currently selected provider profile. Other providers
   remain configured but experience a brief reconnect during this operation.
 - MCP SDK v2 rejects adding brand-new individual tool registrations to an already-connected
