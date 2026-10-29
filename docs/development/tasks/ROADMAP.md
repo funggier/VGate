@@ -17,7 +17,7 @@
 | VG-013 | CLIP STUDIO PAINT Provider & Live Qualification | DONE / DEPLOYED / LIVE GREEN |
 | VG-014 | v0.1.4 CLIP STUDIO PAINT Provider Release | DONE / PUBLISHED / DEPLOYED / LIVE GREEN |
 | VG-015 | Portable per-machine Provider Connection Registry | DONE / DEPLOYED / LIVE GREEN |
-| VG-016 | v0.1.5 Portable Connections Release + CGate Sync | ACTIVE |
+| VG-016 | v0.1.5 Portable Connections Release + CGate Sync | DONE / PUBLISHED / DEPLOYED / CGATE SYNC GREEN |
 
 ## v0.1.0 closure — 2026-10-13
 
